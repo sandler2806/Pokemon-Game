@@ -150,7 +150,7 @@ while client.is_running() == 'true':
     display.update()
 
     # refresh rate
-    clock.tick(60)
+    clock.tick(70)
 
     # choose next edge
     for agent in agents:
