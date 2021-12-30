@@ -9,6 +9,7 @@ import json
 from pygame import gfxdraw
 import pygame
 from pygame import *
+from config import *
 import time
 
 if __name__ == '__main__':
