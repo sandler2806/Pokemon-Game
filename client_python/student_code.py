@@ -71,11 +71,12 @@ if __name__ == '__main__':
 
 
     radius = 15
-
+    print(client.get_agents())
+    print(client.get_info())
     client.add_agent("{\"id\":0}")
-    # client.add_agent("{\"id\":1}")
-    # client.add_agent("{\"id\":2}")
-    # client.add_agent("{\"id\":3}")
+    print(client.add_agent("{\"id\":1}"))
+    client.add_agent("{\"id\":2}")
+    client.add_agent("{\"id\":3}")
 
     # this commnad starts the server - the game is running now
     client.start()
