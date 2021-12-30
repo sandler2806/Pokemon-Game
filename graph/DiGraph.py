@@ -14,13 +14,13 @@ class Container:
 
 class DiGraph:
 
-    def __init__(self, file_name=""):
+    def __init__(self, graphStr):
         self.mc = 0
         adjList = {}
         nodes = {}
-        if file_name != "":
-            with open(file_name, "r") as f:
-                dict2 = json.load(f)
+        if graphStr != "":
+
+            dict2 = json.loads(graphStr)
             edgesL = list(dict2.get('Edges'))
             nodesL = list(dict2.get('Nodes'))
 

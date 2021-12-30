@@ -40,6 +40,14 @@ if __name__ == '__main__':
     FONT = pygame.font.SysFont('Arial', 20, bold=True)
     # load the json string into SimpleNamespace Object
 
+    # load common variables to config
+    gameMap = DiGraph(graph_json)
+    mapAlgo = GraphAlgo(gameMap)
+    print(type(client.get_info()))
+    # agentsNum = client.get_info()["GameServer"]
+    print(agentsNum)
+    # mapAlgo.plot_graph()
+
     graph = json.loads(
         graph_json, object_hook=lambda json_dict: SimpleNamespace(**json_dict))
 
@@ -73,7 +81,7 @@ if __name__ == '__main__':
 
     radius = 15
     print(client.get_agents())
-    print(client.get_info())
+
     client.add_agent("{\"id\":0}")
     print(client.add_agent("{\"id\":1}"))
     client.add_agent("{\"id\":2}")
