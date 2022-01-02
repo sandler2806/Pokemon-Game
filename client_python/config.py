@@ -6,6 +6,7 @@ handledPokemons: list = []
 edgeBank: dict[(float, float), (float, float)] = {}
 
 agents: list = []
+pokemons: list = []
 agentsNum: int = 0
 
 agentsPath: dict[int, [int]] = {}
