@@ -10,7 +10,6 @@ from pygame import gfxdraw
 import pygame
 from pygame import *
 from config import *
-import time
 
 if __name__ == '__main__':
 
@@ -44,9 +43,9 @@ if __name__ == '__main__':
     gameMap = DiGraph(graph_json)
     mapAlgo = GraphAlgo(gameMap)
     print(type(client.get_info()))
-    # agentsNum = client.get_info()["GameServer"]
+    agentsNum = client.get_info()
     print(agentsNum)
-    # mapAlgo.plot_graph()
+    mapAlgo.plot_graph()
 
     graph = json.loads(
         graph_json, object_hook=lambda json_dict: SimpleNamespace(**json_dict))
@@ -104,9 +103,9 @@ if __name__ == '__main__':
             p.pos = SimpleNamespace(x=my_scale(
                 float(x), x=True), y=my_scale(float(y), y=True))
 
-        agents = json.loads(client.get_agents(),
+        agentsJ = json.loads(client.get_agents(),
                             object_hook=lambda d: SimpleNamespace(**d)).Agents
-        agents = [agent.Agent for agent in agents]
+        agents = [agent.Agent for agent in agentsJ]
         for a in agents:
             x, y, _ = a.pos.split(',')
             a.pos = SimpleNamespace(x=my_scale(
@@ -171,14 +170,13 @@ if __name__ == '__main__':
         clock.tick(60)
 
         # choose next edge
-        for agent in agents:
-            if agent.dest == -1:
-                next_node = (agent.src - 1) % len(graph.Nodes)
-                client.choose_next_edge(
-                    '{"agent_id":' + str(agent.id) + ', "next_node_id":' + str(next_node) + '}')
-                ttl = client.time_to_end()
-                print(ttl, client.get_info())
-            client.move()
-            # time.sleep(1)
+        # for agent in agents:
+        #     if agent.dest == -1:
+        #         next_node = (agent.src - 1) % len(graph.Nodes)
+        #         client.choose_next_edge(
+        #             '{"agent_id":' + str(agent.id) + ', "next_node_id":' + str(next_node) + '}')
+        #         ttl = client.time_to_end()
+        #         print(ttl, client.get_info())
+        client.move()
 
     # game over:

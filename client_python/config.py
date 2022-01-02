@@ -1,7 +1,13 @@
 from graph.DiGraph import DiGraph
-from graph.GraphAlgo import GraphAlgo
 
-gameMap = None
-pokemons: DiGraph
-mapAlgo: GraphAlgo
+gameMap = DiGraph
+
+handledPokemons : list
+
+agents: list
 agentsNum: int
+
+agentsPath: dict[int, [int]] = {}
+# critical edges, is an edge where the agent should pick up a pokemon while
+# traversing it
+criticalEdge: dict[int, [tuple]] = {}
