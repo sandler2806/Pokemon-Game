@@ -1,6 +1,6 @@
 from graph.DiGraph import DiGraph
 
-gameMap = DiGraph
+gameMap: DiGraph
 
 handledPokemons : list
 
