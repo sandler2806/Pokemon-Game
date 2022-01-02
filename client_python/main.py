@@ -3,15 +3,16 @@ from types import SimpleNamespace
 from GUI import *
 from client_python.client import Client
 from graph.DiGraph import DiGraph
-from client_python.algo import allocateAgent , dispatchAgents
+from client_python.algo import allocateAgent, dispatchAgents
 import client_python.config as cnf
 
 client: Client
 
 
 def main():
-
     global client
+    EPS = 0.001
+    catchPokemon = False
     client = Client()
     client.start_connection(cnf.HOST, cnf.PORT)
 
@@ -32,15 +33,23 @@ def main():
         assignNewPok()
         # check if any of the agents need to 'Move'
         cnf.agents = json.loads(client.get_agents(),
-                            object_hook=lambda d: SimpleNamespace(**d)).Agents
+                                object_hook=lambda d: SimpleNamespace(**d)).Agents
 
         # print(agentsStatus)
-        for i in range(cnf.agentsNum):
-            if len(cnf.is_on_way_to_pok[i]) != 0:
-                for pos in cnf.is_on_way_to_pok[i]:
-                    pass
+        for agent in cnf.agents:
+            if len(cnf.is_on_way_to_pok[agent.id]) != 0:
+                for pos in cnf.is_on_way_to_pok[agent.id]:
+                    x, y, _ = agent.pos.split(',')
+                    if abs(pos[0] - x) < EPS and abs(pos[1] - y) < EPS:
+                        catchPokemon = True
+
+        if catchPokemon or False is cnf.is_on_way_to_pok:
+            client.move()
+            cnf.is_on_way_to_pok = [True for _ in range(cnf.agentsNum)]
+            catchPokemon = False
 
         flag = 0
+
 
 # def init_game():
 #     global client
@@ -67,11 +76,14 @@ def assignNewPok():
             allocateAgent(pok)
             cnf.handledPokemons.append(pok)
 
-def set_next_node(id : int):
 
+def set_next_node():
     for i in range(cnf.agentsNum):
-        if cnf.agents[i]['Agent']['dest'] == -1 and len(cnf.agentsPath[i]):
-
+        if cnf.agents[i]['Agent']['dest'] == -1 and len(cnf.agentsPath[i]) and isMoved[i]:
+            isMoved[i] = False
+            Next = cnf.agentsPath[i].pop(0)
+            str = "\"agent_id\":{}, \"next_node_id\":{}".format(i, Next)
+            client.choose_next_edge("{" + str + "}")
 
 
 if __name__ == "__main__":

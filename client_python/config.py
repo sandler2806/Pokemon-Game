@@ -13,6 +13,7 @@ agentsPath: dict[int, [int]] = {}
 # critical edges, is an edge where the agent should pick up a pokemon while
 # traversing it
 criticalEdge: dict[int, []] = {}
+isMoved = []
 
 # final parameters
 PORT = 6666

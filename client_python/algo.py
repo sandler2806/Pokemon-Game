@@ -75,7 +75,7 @@ def allocateAgent(pokemon: SimpleNamespace):
         ans = []
         ans.extend(shortest_path(minAgent.src, pokemonEdges[minPermute[0]][0])[1])
         ans.append(pokemonEdges[minPermute[0]][1])
-        ans.remove(0)
+        ans.pop(0)
         for i in range(0, len(minPermute) - 1):
             edge = pokemonEdges[minPermute[i]]
             nextEdge = pokemonEdges[minPermute[i + 1]]
@@ -170,6 +170,8 @@ def dispatchAgents(c: Client):
             str = "\"id\":{}".format(centerId)
         c.add_agent("{" + str + "}")
         cnf.is_on_way_to_pok.append([])
+        cnf.isMoved[i] = True
+
 
 
 def centerPoint() -> int:
