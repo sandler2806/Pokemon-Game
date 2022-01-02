@@ -82,6 +82,10 @@ def allocateAgent(pokemon: SimpleNamespace):
 
             ans.extend(shortest_path(edge[1], nextEdge[0])[1])
             ans.append(cnf.gameMap.adjList[nextEdge[0]].outEdges[nextEdge[1]])
+    if len(cnf.criticalEdge[minAgent.id]) == 0:
+        cnf.criticalEdge[minAgent.id] = [newEdge]
+    else:
+        cnf.criticalEdge[minAgent.id].append(newEdge)
 
 
 def dijkstra(src: int) -> (dict, dict):
@@ -155,9 +159,37 @@ def getPath(prev: dict, src, dest):
 def dispatchAgents(c: Client):
     j = json.loads(c.get_info())
     cnf.agentsNum = j['GameServer']['agents']
-
-    for i in range(0, cnf.agentsNum):
-        str = "\"id\":{}".format(i)
-        print(str)
+    centerId = centerPoint()
+    str = "\"id\":{}".format(centerId)
+    c.add_agent("{" + str + "}")
+    cnf.is_on_way_to_pok.append([])
+    for i in range(1, cnf.agentsNum):
+        if ((centerId + i * (cnf.gameMap.v_size() / cnf.agentsNum)) % cnf.gameMap.v_size()) in cnf.gameMap.nodes.keys():
+            str = "\"id\":{}".format((centerId + i * cnf.gameMap.v_size() / cnf.agentsNum) % cnf.gameMap.v_size())
+        else:
+            str = "\"id\":{}".format(centerId)
         c.add_agent("{" + str + "}")
-        cnf.is_on_way_to_pok.append(False)
+        cnf.is_on_way_to_pok.append([])
+
+
+def centerPoint() -> int:
+    """
+    Finds the node that has the shortest distance to it's farthest node.
+    :return: The nodes id, min-maximum distance
+    """
+    # calculate the eccentricity of each node
+    eccentricity = {}  # saving the eccentricity of each node
+    for node in cnf.gameMap.get_all_v().values():
+        distance = dijkstra(node.get__id())[1]
+        max_value = max(distance.values())
+        eccentricity[node.get__id()] = max_value
+    # take the min value of all the eccentricity
+    min_value = min(eccentricity.values())
+    ind = list(eccentricity.keys())[list(eccentricity.values()).index(min_value)]
+
+    Max = max(eccentricity.values())
+    if Max == math.inf:  # one node is not reachable, there fore the graph is not connected
+        ind = None
+        min_value = math.inf
+    # return the min eccentricity and the node index
+    return ind

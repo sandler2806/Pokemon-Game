@@ -1,10 +1,7 @@
-from ctypes import Union
 
 from pygame import gfxdraw
 import pygame
 from pygame import *
-from pygame.surface import SurfaceType
-from pygame.time import Clock
 
 from client_python.config import *
 
@@ -98,7 +95,6 @@ def draw():
 
     # update screen changes
     display.update()
-
 
 
 def scale(data, min_screen, max_screen, min_data, max_data):
