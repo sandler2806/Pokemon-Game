@@ -1,7 +1,6 @@
 import json
 from abc import ABC
 
-
 from graph.Node import Node
 
 
@@ -119,6 +118,22 @@ class DiGraph:
             self.mc += 1
             return True
         return False
+
+    def edgeToLinear(self):
+        bank: dict[str, (float, float)] = {}
+        # bank: str,(float,float) = {}
+        for src in self.nodes.values():
+            outE = list(self.adjList[src.id].outEdges.keys())
+            for dest in outE:
+                dest = self.nodes[dest]
+                x1 = src.pos[0]
+                x2 = dest.pos[0]
+                y1 = src.pos[1]
+                y2 = dest.pos[1]
+                m = (y1 - y2) / (x1 - x2)
+                b = y1 - m * x1
+                bank[str(src.id) + "-" + str(dest.id)] = (m, b)
+        return bank
 
     def remove_edge(self, node_id1: int, node_id2: int) -> bool:
         if node_id1 in self.nodes and node_id2 in self.adjList[node_id1].outEdges:
