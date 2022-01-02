@@ -28,19 +28,19 @@ def main():
     client.start()
     flag = 1
     while flag:
-        # load existing pokemon from the server
-
-        # check if any of the agents need 'Move'
-
+        # assigning an agent for new pokemon's from the server
+        assignNewPok()
+        # check if any of the agents need to 'Move'
         agentsJ = json.loads(client.get_agents(),
                             object_hook=lambda d: SimpleNamespace(**d)).Agents
 
         # print(agentsStatus)
-        for agent in cnf.agents:
-            pass
+        for i in range(cnf.agentsNum):
+            if len(cnf.is_on_way_to_pok[i]) != 0:
+                for pos in cnf.is_on_way_to_pok[i]:
+                    pass
 
         flag = 0
-
 
 # def init_game():
 #     global client

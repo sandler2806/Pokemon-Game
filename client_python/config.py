@@ -11,8 +11,9 @@ agentsNum: int = 0
 agentsPath: dict[int, [int]] = {}
 # critical edges, is an edge where the agent should pick up a pokemon while
 # traversing it
-criticalEdge: dict[int, [tuple]] = {}
+criticalEdge: dict[int, []] = {}
 
 # final parameters
 PORT = 6666
 HOST = '127.0.0.1'
+is_on_way_to_pok = [[]]  # initiated in "dispachAgents" (in algo.c)

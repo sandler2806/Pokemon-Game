@@ -160,3 +160,4 @@ def dispatchAgents(c: Client):
         str = "\"id\":{}".format(i)
         print(str)
         c.add_agent("{" + str + "}")
+        cnf.is_on_way_to_pok.append(False)
