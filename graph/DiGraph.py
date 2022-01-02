@@ -120,8 +120,7 @@ class DiGraph:
         return False
 
     def edgeToLinear(self):
-        bank: dict[str, (float, float)] = {}
-        # bank: str,(float,float) = {}
+        bank: dict[(float, float), (float, float)] = {}
         for src in self.nodes.values():
             outE = list(self.adjList[src.id].outEdges.keys())
             for dest in outE:
@@ -132,7 +131,7 @@ class DiGraph:
                 y2 = dest.pos[1]
                 m = (y1 - y2) / (x1 - x2)
                 b = y1 - m * x1
-                bank[str(src.id) + "-" + str(dest.id)] = (m, b)
+                bank[(src.id,dest.id)] = (m, b)
         return bank
 
     def remove_edge(self, node_id1: int, node_id2: int) -> bool:

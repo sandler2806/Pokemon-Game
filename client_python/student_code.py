@@ -41,11 +41,9 @@ if __name__ == '__main__':
 
     # load common variables to config
     gameMap = DiGraph(graph_json)
-    mapAlgo = GraphAlgo(gameMap)
     print(type(client.get_info()))
     agentsNum = client.get_info()
     print(agentsNum)
-    mapAlgo.plot_graph()
 
     graph = json.loads(
         graph_json, object_hook=lambda json_dict: SimpleNamespace(**json_dict))
@@ -170,13 +168,15 @@ if __name__ == '__main__':
         clock.tick(60)
 
         # choose next edge
-        # for agent in agents:
-        #     if agent.dest == -1:
-        #         next_node = (agent.src - 1) % len(graph.Nodes)
-        #         client.choose_next_edge(
-        #             '{"agent_id":' + str(agent.id) + ', "next_node_id":' + str(next_node) + '}')
-        #         ttl = client.time_to_end()
-        #         print(ttl, client.get_info())
+        for agent in agents:
+            if agent.dest == -1:
+                next_node = (agent.src - 1) % len(graph.Nodes)
+                client.choose_next_edge(
+                    '{"agent_id":' + str(agent.id) + ', "next_node_id":' + str(next_node) + '}')
+                ttl = client.time_to_end()
+                print(ttl, client.get_info())
+                print(client.get_agents())
+                print(client.get_pokemons())
         client.move()
 
     # game over:

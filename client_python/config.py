@@ -2,12 +2,17 @@ from graph.DiGraph import DiGraph
 
 gameMap: DiGraph
 
-handledPokemons : list
+handledPokemons: list = []
+edgeBank: dict[(float, float), (float, float)] = {}
 
-agents: list
-agentsNum: int
+agents: list = []
+agentsNum: int = 0
 
 agentsPath: dict[int, [int]] = {}
 # critical edges, is an edge where the agent should pick up a pokemon while
 # traversing it
 criticalEdge: dict[int, [tuple]] = {}
+
+# final parameters
+PORT = 6666
+HOST = '127.0.0.1'
