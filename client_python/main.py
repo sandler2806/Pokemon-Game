@@ -31,7 +31,7 @@ def main():
         # assigning an agent for new pokemon's from the server
         assignNewPok()
         # check if any of the agents need to 'Move'
-        agentsJ = json.loads(client.get_agents(),
+        cnf.agents = json.loads(client.get_agents(),
                             object_hook=lambda d: SimpleNamespace(**d)).Agents
 
         # print(agentsStatus)
@@ -66,6 +66,12 @@ def assignNewPok():
         if not isHandled(pok):
             allocateAgent(pok)
             cnf.handledPokemons.append(pok)
+
+def set_next_node(id : int):
+
+    for i in range(cnf.agentsNum):
+        if cnf.agents[i]['Agent']['dest'] == -1 and len(cnf.agentsPath[i]):
+
 
 
 if __name__ == "__main__":
