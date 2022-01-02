@@ -21,6 +21,7 @@ def main():
     dispatchAgents(client)
     # load the map to graph
     cnf.gameMap = DiGraph(client.get_graph())
+    cnf.edgeBank = gameMap.edgeToLinear()
     # assigning the starting Pokemon's
     assignNewPok()
 
@@ -66,9 +67,17 @@ def isHandled(pok) -> bool:
 
 
 def assignNewPok():
-    pokemons = json.loads(client.get_pokemons(),
-                          object_hook=lambda d: SimpleNamespace(**d)).Pokemons
-    pokemons = [p.Pokemon for p in pokemons]
+    cnf.pokemons = json.loads(client.get_pokemons(),
+                              object_hook=lambda d: SimpleNamespace(**d)).Pokemons
+    cnf.pokemons = [p.Pokemon for p in cnf.pokemons]
+
+    for p in cnf.handledPokemons:
+        exist = False
+        for pok in pokemons:
+            if p.pos == pok.pos and p.type == pok.type:
+                exist = True
+        if not exist:
+            cnf.handledPokemons.remove(p)
 
     # look for new Pokemon's
     for pok in pokemons:
