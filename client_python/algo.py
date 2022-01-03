@@ -18,7 +18,8 @@ def allocateEdge(bank: dict[(float, float), (float, float)], pos: list, type: in
     for edge, mb in bank.items():
         m = mb[0]
         b = mb[1]
-        booli = (float(y) == m * float(x) + b)
+        booli = (abs(float(y) - (m * float(x) + b)) < 0.0001)
+        # booli = float(y) == m * float(x) + b
         if booli:
             if type > 0:
                 edge = (min(edge[0], edge[1]), max(edge[0], edge[1]))
@@ -70,17 +71,19 @@ def allocateAgent(pokemon: SimpleNamespace):
                     minDelay = dist / agent.speed
                     minAgent = agent
                     minPermute = p
+
+    src = minAgent.src if minAgent.dest == -1 else minAgent.dest
     if len(minPermute) == 0:
-        cnf.agentsPath[minAgent.id] = shortest_path(minAgent.src, newEdge[0])[1]
+        cnf.agentsPath[minAgent.id] = shortest_path(src, newEdge[0])[1]
         cnf.agentsPath[minAgent.id].append(newEdge[1] + 0.5)
         cnf.agentsPath[minAgent.id].pop(0)
         start = cnf.agentsPath[minAgent.id].pop(0)
-        cnf.agentsPath[minAgent.id].insert(0,start + 0.1)
+        cnf.agentsPath[minAgent.id].insert(0, start + 0.75)
     else:
         pokemonEdges = cnf.criticalEdge[minAgent.id]
         pokemonEdges.insert(0, newEdge)
         ans = []
-        ans.extend(shortest_path(minAgent.src, pokemonEdges[minPermute[0]][0])[1])
+        ans.extend(shortest_path(src, pokemonEdges[minPermute[0]][0])[1])
         ans.append(pokemonEdges[minPermute[0]][1])
         ans.pop(0)
         for i in range(0, len(minPermute) - 1):

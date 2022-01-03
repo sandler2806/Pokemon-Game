@@ -4,17 +4,16 @@ from GUI import *
 import pygame
 from client_python.client import Client
 from graph.DiGraph import DiGraph
-from client_python.algo import allocateAgent, dispatchAgents
+from client_python.algo import allocateAgent, dispatchAgents, allocateEdge
 import client_python.config as cnf
+import math as mt
 
 client: Client
-
 
 def main():
     global client
     moveCounter = 0
     clock = pygame.time.Clock()
-    EPS = 0.001
     catchPokemon = False
     client = Client()
     client.start_connection(cnf.HOST, cnf.PORT)
@@ -42,14 +41,20 @@ def main():
         # check if any of the agents need to 'Move'
 
         set_next_node()
+
         # print(agentsStatus)
-        for agent in cnf.agents:
-            if len(cnf.is_on_way_to_pok[agent.id]) != 0:
-                for pos in cnf.is_on_way_to_pok[agent.id]:
-                    x, y, _ = agent.pos.split(',')
-                    if abs(pos[0] - x) < EPS and abs(pos[1] - y) < EPS:
-                        catchPokemon = True
-                        cnf.is_on_way_to_pok[agent.id].remove(pos)
+        # for agent in cnf.agents:
+        #     if len(cnf.is_on_way_to_pok[agent.id]) != 0:
+        #         for pos in cnf.is_on_way_to_pok[agent.id]:
+        #             x, y, _ = agent.pos.split(',')
+        #             if abs(pos[0] - x) < EPS and abs(pos[1] - y) < EPS:
+        #                 catchPokemon = True
+        #                 cnf.is_on_way_to_pok[agent.id].remove(pos)
+        cnf.pokemonTimes.sort(reverse=True)
+        if len(cnf.pokemonTimes) > 0 and cnf.pokemonTimes[0] >= float(client.time_to_end()):
+            client.move()
+            print("ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp")
+            cnf.pokemonTimes.pop(0)
 
         timePassed = starTime - float(client.time_to_end())
         print(catchPokemon)
@@ -73,13 +78,22 @@ def main():
 
     # while True:
     #     print(client.get_agents())
-    #     print(client.get_info())
     #     client.choose_next_edge('{"agent_id":' + str(0) + ', "next_node_id":' + str(8) + '}')
-    #     print(client.get_agents())
-    #     print(client.get_info())
     #     client.move()
     #     print(client.get_agents())
-    #     print(client.get_info())
+    #     # print(client.get_agents())
+    #     # print(client.get_agents())
+    #
+    #     client.move()
+    #     print(client.get_agents())
+    #     print(client.get_agents())
+    #
+    #     print(client.get_agents())
+    #     print(client.get_agents())
+    #     print(client.get_agents())
+    #     print(client.get_agents())
+    #
+    #     # print(client.get_info())
     #     client.choose_next_edge('{"agent_id":' + str(0) + ', "next_node_id":' + str(9) + '}')
     #     print(client.get_agents())
     #     print(client.get_info())
@@ -125,15 +139,38 @@ def assignNewPok():
 
 
 def set_next_node():
+    EPS = 0.001
     for i in range(cnf.agentsNum):
         if cnf.agents[i].dest == -1 and len(cnf.agentsPath[i]) and cnf.isMoved[i]:
             cnf.isMoved[i] = False
+            src = cnf.agents[i].src
             Next = cnf.agentsPath[i].pop(0)
-            if Next % 1 == 0.1:
+            if Next % 1==0.75:
                 client.move()
-            Next = int(Next)
+                Next = int(Next)
+            if Next % 1 == 0.5:
+                Next = int(Next)
+                pokOnEdge = []
+                for pokemon in cnf.pokemons:
+                    x, y, _ = pokemon.pos.split(',')
+                    edge = allocateEdge(cnf.edgeBank, [x, y], pokemon.type)
+                    if edge == (src, Next):
+                        pokOnEdge.append(pokemon)
+
+                weight = cnf.gameMap.all_out_edges_of_node(src)[Next]
+                Sx, Sy, _ = cnf.agents[i].pos.split(',')
+                Dx = cnf.gameMap.nodes[Next].pos[0]
+                Dy = cnf.gameMap.nodes[Next].pos[1]
+                edgeDistance = mt.sqrt(mt.pow(float(Sx) - Dx, 2) + mt.pow(float(Sy) - Dy, 2))
+
+                for pokemon in pokOnEdge:
+                    Px, Py, _ = pokemon.pos.split(',')
+                    distance = mt.sqrt(mt.pow(float(Sx) - float(Px), 2) + mt.pow(float(Sy) - float(Py), 2))
+                    pokWeight = (distance / edgeDistance) * weight
+                    cnf.pokemonTimes.append(float(client.time_to_end()) - ((pokWeight / cnf.agents[i].speed) * 1000))
+
             client.choose_next_edge('{"agent_id":' + str(i) + ', "next_node_id":' + str(Next) + '}')
-            weight = cnf.gameMap.all_out_edges_of_node(cnf.agents[i].src)[Next]
+            weight = cnf.gameMap.all_out_edges_of_node(src)[Next]
             cnf.moveTimes.append(float(client.time_to_end()) - ((weight / cnf.agents[i].speed) * 1000))
 
 
