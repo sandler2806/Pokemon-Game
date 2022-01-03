@@ -10,6 +10,7 @@ import math as mt
 
 client: Client
 
+
 def main():
     global client
     moveCounter = 0
@@ -145,10 +146,11 @@ def set_next_node():
             cnf.isMoved[i] = False
             src = cnf.agents[i].src
             Next = cnf.agentsPath[i].pop(0)
-            if Next % 1==0.75:
-                client.move()
-                Next = int(Next)
-            if Next % 1 == 0.5:
+            # if Next % 1==0.75:
+            #     client.move()
+            #     Next = int(Next)
+            if (src, Next) in cnf.criticalEdge[i]:
+                cnf.criticalEdge[i].remove((src, Next))
                 Next = int(Next)
                 pokOnEdge = []
                 for pokemon in cnf.pokemons:
