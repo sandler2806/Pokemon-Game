@@ -12,12 +12,13 @@ client: Client
 
 def main():
     global client
-    counter = 0
+    moveCounter = 0
     clock = pygame.time.Clock()
     EPS = 0.001
     catchPokemon = False
     client = Client()
     client.start_connection(cnf.HOST, cnf.PORT)
+    starTime = float(client.time_to_end())
 
     print(client.get_agents())
 
@@ -34,9 +35,8 @@ def main():
     client.start()
     flag = 1
     while flag:
-        # print(client.get_agents())
-        print(counter)
-        counter += 1
+        print(client.get_agents())
+        print(client.time_to_end())
         # assigning an agent for new pokemon's from the server
         # check if any of the agents need to 'Move'
 
@@ -50,14 +50,28 @@ def main():
                         catchPokemon = True
                         cnf.is_on_way_to_pok[agent.id].remove(pos)
 
-        if catchPokemon or False in cnf.isMoved:
+        currentTime = starTime - float(client.time_to_end())
+        if catchPokemon or False in cnf.isMoved and moveCounter <= currentTime / 100:
+            cnf.moveTimes.sort(reverse=True)
+            while cnf.moveTimes[0] >= currentTime:
+                cnf.moveTimes.pop(0)
             client.move()
+            moveCounter += 1
             cnf.isMoved = [True for _ in range(cnf.agentsNum)]
             catchPokemon = False
 
-        # draw()
+        draw()
         assignNewPok()
-        clock.tick(2)
+        # client.move()
+        clock.tick(60)
+
+    # while True:
+    #     client.move()
+    #     print(client.get_agents())
+    #     print(counter)
+    #     print(client.get_info())
+    #     counter += 1
+    #     clock.tick(2)
 
 
 # def init_game():
@@ -104,6 +118,8 @@ def set_next_node():
             cnf.isMoved[i] = False
             Next = cnf.agentsPath[i].pop(0)
             client.choose_next_edge('{"agent_id":' + str(i) + ', "next_node_id":' + str(Next) + '}')
+            weight = cnf.gameMap.all_out_edges_of_node(cnf.agents[i].src)[Next]
+            cnf.moveTimes.append(float(client.time_to_end()) - ((weight / cnf.agents[i].speed) * 1000))
 
 
 if __name__ == "__main__":
