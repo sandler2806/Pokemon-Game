@@ -36,6 +36,7 @@ def main():
     flag = 1
     while flag:
         print(client.get_agents())
+        print(client.get_info())
         print(client.time_to_end())
         # assigning an agent for new pokemon's from the server
         # check if any of the agents need to 'Move'
@@ -51,13 +52,18 @@ def main():
                         cnf.is_on_way_to_pok[agent.id].remove(pos)
 
         timePassed = starTime - float(client.time_to_end())
-        if catchPokemon or False in cnf.isMoved and moveCounter <= timePassed / 100:
+        print(catchPokemon)
+        print(False in cnf.isMoved)
+        if catchPokemon or (False in cnf.isMoved and moveCounter <= timePassed / 100):
             cnf.moveTimes.sort(reverse=True)
+            if len(cnf.moveTimes) > 0 and cnf.moveTimes[0] >= float(client.time_to_end()):
+                client.move()
+                print("moved")
+                moveCounter += 1
+                cnf.isMoved = [True for _ in range(cnf.agentsNum)]
             while len(cnf.moveTimes) > 0 and cnf.moveTimes[0] >= float(client.time_to_end()):
                 cnf.moveTimes.pop(0)
-            client.move()
-            moveCounter += 1
-            cnf.isMoved = [True for _ in range(cnf.agentsNum)]
+
             catchPokemon = False
 
         draw()
@@ -66,12 +72,18 @@ def main():
         clock.tick(60)
 
     # while True:
+    #     print(client.get_agents())
+    #     print(client.get_info())
+    #     client.choose_next_edge('{"agent_id":' + str(0) + ', "next_node_id":' + str(8) + '}')
+    #     print(client.get_agents())
+    #     print(client.get_info())
     #     client.move()
     #     print(client.get_agents())
-    #     print(counter)
     #     print(client.get_info())
-    #     counter += 1
-    #     clock.tick(2)
+    #     client.choose_next_edge('{"agent_id":' + str(0) + ', "next_node_id":' + str(9) + '}')
+    #     print(client.get_agents())
+    #     print(client.get_info())
+    #     client.move()
 
 
 # def init_game():
@@ -117,6 +129,9 @@ def set_next_node():
         if cnf.agents[i].dest == -1 and len(cnf.agentsPath[i]) and cnf.isMoved[i]:
             cnf.isMoved[i] = False
             Next = cnf.agentsPath[i].pop(0)
+            if Next % 1 == 0.1:
+                client.move()
+            Next = int(Next)
             client.choose_next_edge('{"agent_id":' + str(i) + ', "next_node_id":' + str(Next) + '}')
             weight = cnf.gameMap.all_out_edges_of_node(cnf.agents[i].src)[Next]
             cnf.moveTimes.append(float(client.time_to_end()) - ((weight / cnf.agents[i].speed) * 1000))

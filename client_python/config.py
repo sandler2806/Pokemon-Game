@@ -15,7 +15,6 @@ agentsPath: dict[int, [int]] = {}
 criticalEdge: dict[int, []] = {}
 isMoved = []
 moveTimes=[]
-
 # final parameters
 PORT = 6666
 HOST = '127.0.0.1'

@@ -74,6 +74,8 @@ def allocateAgent(pokemon: SimpleNamespace):
         cnf.agentsPath[minAgent.id] = shortest_path(minAgent.src, newEdge[0])[1]
         cnf.agentsPath[minAgent.id].append(newEdge[1] + 0.5)
         cnf.agentsPath[minAgent.id].pop(0)
+        start = cnf.agentsPath[minAgent.id].pop(0)
+        cnf.agentsPath[minAgent.id].insert(0,start + 0.1)
     else:
         pokemonEdges = cnf.criticalEdge[minAgent.id]
         pokemonEdges.insert(0, newEdge)
@@ -85,7 +87,7 @@ def allocateAgent(pokemon: SimpleNamespace):
             edge = pokemonEdges[minPermute[i]]
             nextEdge = pokemonEdges[minPermute[i + 1]]
 
-            temp=shortest_path(edge[1], nextEdge[0])[1]
+            temp = shortest_path(edge[1], nextEdge[0])[1]
             temp.pop(0)
             ans.extend(temp)
             ans.append(cnf.gameMap.adjList[nextEdge[0]].outEdges[nextEdge[1]])
