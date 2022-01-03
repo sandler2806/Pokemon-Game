@@ -1,15 +1,16 @@
-
 from pygame import gfxdraw
 import pygame
 from pygame import *
+import copy
+from types import SimpleNamespace
 
-from client_python.config import *
+import client_python.config as cnf
 
 min_x: float
 min_y: float
 max_x: float
 max_y: float
-screen
+screen = display.set_mode((1080, 720), depth=32, flags=RESIZABLE)
 radius = 15
 FONT: font
 
@@ -27,10 +28,10 @@ def init_GUI():
     FONT = pygame.font.SysFont('Arial', 20, bold=True)
 
     # get data proportions
-    min_x = min(list(gameMap.nodes.values()), key=lambda n: n.pos[0]).pos[0]
-    min_y = min(list(gameMap.nodes.values()), key=lambda n: n.pos[1]).pos[1]
-    max_x = max(list(gameMap.nodes.values()), key=lambda n: n.pos[0]).pos[0]
-    max_y = max(list(gameMap.nodes.values()), key=lambda n: n.pos[1]).pos[1]
+    min_x = min(list(cnf.gameMap.nodes.values()), key=lambda n: n.pos[0]).pos[0]
+    min_y = min(list(cnf.gameMap.nodes.values()), key=lambda n: n.pos[1]).pos[1]
+    max_x = max(list(cnf.gameMap.nodes.values()), key=lambda n: n.pos[0]).pos[0]
+    max_y = max(list(cnf.gameMap.nodes.values()), key=lambda n: n.pos[1]).pos[1]
 
     """
     The code below should be improved significantly:
@@ -49,7 +50,7 @@ def draw():
     screen.fill(Color(0, 0, 0))
 
     # draw nodes
-    for n in gameMap.nodes.values():
+    for n in cnf.gameMap.nodes.values():
         x = my_scale(n.pos[0], x=True)
         y = my_scale(n.pos[1], y=True)
 
@@ -65,11 +66,12 @@ def draw():
         screen.blit(id_srf, rect)
 
     # draw edges
-    for src in gameMap.get_all_v().keys():
-        for dest in gameMap.all_out_edges_of_node(src).keys():
+    for src in cnf.gameMap.get_all_v().values():
+        for dest in cnf.gameMap.all_out_edges_of_node(src.id).keys():
             # find the edge nodes
             # src = next(n for n in gameMap.nodes.values() if n.id == e.src)
             # dest = next(n for n in graph.Nodes if n.id == e.dest)
+            dest = cnf.gameMap.get_node(dest)
 
             # scaled positions
             src_x = my_scale(src.pos[0], x=True)
@@ -82,12 +84,24 @@ def draw():
                              (src_x, src_y), (dest_x, dest_y))
 
     # draw agents
-    for agent in agents:
+    scaledPok = copy.deepcopy(cnf.pokemons)
+    for p in scaledPok:
+        x, y, _ = p.pos.split(',')
+        p.pos = SimpleNamespace(x=my_scale(
+            float(x), x=True), y=my_scale(float(y), y=True))
+
+    scaledAgents = copy.deepcopy(cnf.agents)
+    for a in scaledAgents:
+        x, y, _ = a.pos.split(',')
+        a.pos = SimpleNamespace(x=my_scale(
+            float(x), x=True), y=my_scale(float(y), y=True))
+
+    for agent in scaledAgents:
         pygame.draw.circle(screen, Color(122, 61, 23),
                            (int(agent.pos.x), int(agent.pos.y)), 10)
     # draw pokemons (note: should differ (GUI wise) between the up and the down pokemons (currently they are marked
     # in the same way).
-    for p in pokemons:
+    for p in scaledPok:
         if p.type > 0:
             pygame.draw.circle(screen, Color(0, 255, 255), (int(p.pos.x), int(p.pos.y)), 10)
         else:

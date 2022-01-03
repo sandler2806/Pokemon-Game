@@ -17,5 +17,6 @@ isMoved = []
 
 # final parameters
 PORT = 6666
-HOST = '127.0.0.1'
+# HOST = '127.0.0.1'
+HOST='10.9.7.71'
 is_on_way_to_pok: list = []  # initiated in "dispatchAgents" (in algo.c)

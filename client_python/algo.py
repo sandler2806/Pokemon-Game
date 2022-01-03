@@ -11,7 +11,7 @@ import itertools
 import copy
 
 
-def allocateEdge(bank: dict[(float, float), (float, float)], pos: list) -> (float, float):
+def allocateEdge(bank: dict[(float, float), (float, float)], pos: list, type: int) -> (float, float):
     x = pos[0]
     y = pos[1]
 
@@ -20,6 +20,10 @@ def allocateEdge(bank: dict[(float, float), (float, float)], pos: list) -> (floa
         b = mb[1]
         booli = (float(y) == m * float(x) + b)
         if booli:
+            if type > 0:
+                edge = (min(edge[0], edge[1]), max(edge[0], edge[1]))
+            else:
+                edge = (max(edge[0], edge[1]), min(edge[0], edge[1]))
             return edge
     return None
 
@@ -29,7 +33,7 @@ def allocateAgent(pokemon: SimpleNamespace):
     minAgent = None
     minPermute = []
     x, y, _ = pokemon.pos.split(',')
-    newEdge = allocateEdge(cnf.edgeBank, [x, y])
+    newEdge = allocateEdge(cnf.edgeBank, [x, y], pokemon.type)
     for agent in cnf.agents:
         src = agent.src if agent.dest == -1 else agent.dest
         if len(cnf.agentsPath[agent.id]) == 0:
@@ -37,7 +41,7 @@ def allocateAgent(pokemon: SimpleNamespace):
             dist += cnf.gameMap.adjList[newEdge[0]].outEdges[newEdge[1]]
             if dist / agent.speed < minDelay:
                 minDelay = dist / agent.speed
-                minAgent = agent.id
+                minAgent = agent
         else:
             arriveNewPokemon = False
             pokemonEdges = list(copy.deepcopy(cnf.criticalEdge[agent.id]))
@@ -69,6 +73,7 @@ def allocateAgent(pokemon: SimpleNamespace):
     if len(minPermute) == 0:
         cnf.agentsPath[minAgent.id] = shortest_path(minAgent.src, newEdge[0])[1]
         cnf.agentsPath[minAgent.id].append(newEdge[1] + 0.5)
+        cnf.agentsPath[minAgent.id].pop(0)
     else:
         pokemonEdges = cnf.criticalEdge[minAgent.id]
         pokemonEdges.insert(0, newEdge)
@@ -80,7 +85,9 @@ def allocateAgent(pokemon: SimpleNamespace):
             edge = pokemonEdges[minPermute[i]]
             nextEdge = pokemonEdges[minPermute[i + 1]]
 
-            ans.extend(shortest_path(edge[1], nextEdge[0])[1])
+            temp=shortest_path(edge[1], nextEdge[0])[1]
+            temp.pop(0)
+            ans.extend(temp)
             ans.append(cnf.gameMap.adjList[nextEdge[0]].outEdges[nextEdge[1]])
     if len(cnf.criticalEdge[minAgent.id]) == 0:
         cnf.criticalEdge[minAgent.id] = [newEdge]
@@ -163,6 +170,9 @@ def dispatchAgents(c: Client):
     str = "\"id\":{}".format(centerId)
     c.add_agent("{" + str + "}")
     cnf.is_on_way_to_pok.append([])
+    cnf.isMoved.append(True)
+    cnf.agentsPath[0] = []
+    cnf.criticalEdge[0] = []
     for i in range(1, cnf.agentsNum):
         if ((centerId + i * (cnf.gameMap.v_size() / cnf.agentsNum)) % cnf.gameMap.v_size()) in cnf.gameMap.nodes.keys():
             str = "\"id\":{}".format((centerId + i * cnf.gameMap.v_size() / cnf.agentsNum) % cnf.gameMap.v_size())
@@ -170,8 +180,9 @@ def dispatchAgents(c: Client):
             str = "\"id\":{}".format(centerId)
         c.add_agent("{" + str + "}")
         cnf.is_on_way_to_pok.append([])
-        cnf.isMoved[i] = True
-
+        cnf.isMoved.append(True)
+        cnf.agentsPath[i] = []
+        cnf.criticalEdge[i] = []
 
 
 def centerPoint() -> int:
