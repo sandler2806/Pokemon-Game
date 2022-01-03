@@ -18,7 +18,6 @@ def main():
     catchPokemon = False
     client = Client()
     client.start_connection(cnf.HOST, cnf.PORT)
-    starTime = float(client.time_to_end())
 
     print(client.get_agents())
 
@@ -33,6 +32,7 @@ def main():
     init_GUI()
     # start the game
     client.start()
+    starTime = float(client.time_to_end())
     flag = 1
     while flag:
         print(client.get_agents())
@@ -50,10 +50,10 @@ def main():
                         catchPokemon = True
                         cnf.is_on_way_to_pok[agent.id].remove(pos)
 
-        currentTime = starTime - float(client.time_to_end())
-        if catchPokemon or False in cnf.isMoved and moveCounter <= currentTime / 100:
+        timePassed = starTime - float(client.time_to_end())
+        if catchPokemon or False in cnf.isMoved and moveCounter <= timePassed / 100:
             cnf.moveTimes.sort(reverse=True)
-            while cnf.moveTimes[0] >= currentTime:
+            while len(cnf.moveTimes) > 0 and cnf.moveTimes[0] >= float(client.time_to_end()):
                 cnf.moveTimes.pop(0)
             client.move()
             moveCounter += 1
