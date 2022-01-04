@@ -41,14 +41,19 @@ def init_GUI():
 
 def draw():
     global radius, FONT, screen
+    background_img = pygame.image.load(r'C:\Users\sandl\PycharmProjects\PokemonGame\data\pok.png')
+    background = pygame.transform.scale(background_img, (screen.get_width(), screen.get_height()))
+    screen.blit(background, (0, 0))
+
     buttonW = 50
     buttonH = 30
-    buttonX = screen.get_width() / 10
+    buttonX = screen.get_width() / 1.1
     buttonY = screen.get_height() / 15
 
-    counterX = screen.get_width() / 1.3
-    gradeX = screen.get_width() / 1.3
-    gradeY = buttonY + buttonH
+    counterX = screen.get_width() / 50
+    gradeX = screen.get_width() / 50
+    gradeY = buttonY - buttonH*2/3
+    timerY=gradeY-buttonH*2/3
 
     mouse = pygame.mouse.get_pos()
     for event in pygame.event.get():
@@ -62,15 +67,18 @@ def draw():
             if buttonX <= mouse[0] <= buttonX + buttonW and buttonY <= mouse[1] <= screen.get_height() + buttonH:
                 pygame.quit()
     # refresh surface
-    screen.fill(Color(0, 0, 0))
-
-    smallfont = pygame.font.SysFont('Corbel', 17)
-    pygame.draw.rect(screen, (255, 255, 255), [buttonX, buttonY, buttonW, buttonH])
-    screen.blit(smallfont.render('stop', True, (255, 0, 0)), (buttonX + buttonW / 4, buttonY))
-    screen.blit(smallfont.render('move counter:', True, (255, 0, 0)), (counterX + buttonW / 4, buttonY))
-    screen.blit(smallfont.render('grade:', True, (255, 0, 0)), (gradeX + buttonW / 4, gradeY))
-    screen.blit(smallfont.render(str(cnf.grade), True, (255, 0, 0)), (gradeX + 5*buttonW / 4, gradeY))
-    screen.blit(smallfont.render(str(cnf.movecounter), True, (255, 0, 0)), (counterX +10*buttonW / 4, buttonY))
+    # screen.fill(Color(0, 0, 0))
+    my_formatter = "{0:.1f}"
+    timer = my_formatter.format(cnf.timeToEnd/1000)
+    smallfont = pygame.font.SysFont('Corbel', 17,bold=True)
+    pygame.draw.rect(screen, (227, 244, 91), [buttonX, buttonY, buttonW, buttonH])
+    screen.blit(smallfont.render('stop', True, (0, 0, 0)), (buttonX + buttonW / 6, buttonY + buttonH / 4))
+    screen.blit(smallfont.render('move counter:', True, (0, 0, 0)), (counterX + buttonW / 4, buttonY))
+    screen.blit(smallfont.render('grade:', True, (0, 0, 0)), (gradeX + buttonW / 4, gradeY))
+    screen.blit(smallfont.render(str(cnf.grade), True, (0, 0, 0)), (gradeX + 5 * buttonW / 4, gradeY))
+    screen.blit(smallfont.render(str(cnf.movecounter), True, (0, 0, 0)), (counterX + 10 * buttonW / 4, buttonY))
+    screen.blit(smallfont.render('time left:', True, (0, 0, 0)), (gradeX + buttonW / 4, timerY))
+    screen.blit(smallfont.render(str(timer), True, (0, 0, 0)), (gradeX + 6.5 * buttonW / 4, timerY))
 
     # (width / 2 + 50, height / 2)
     # draw nodes
@@ -104,7 +112,7 @@ def draw():
             dest_y = my_scale(dest.pos[1], y=True)
 
             # draw the line
-            pygame.draw.line(screen, Color(61, 72, 126),
+            pygame.draw.line(screen, Color(0, 0, 0),
                              (src_x, src_y), (dest_x, dest_y))
 
     # draw agents
