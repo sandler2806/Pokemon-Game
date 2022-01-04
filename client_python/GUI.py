@@ -41,7 +41,7 @@ def init_GUI():
 
 def draw():
     global radius, FONT, screen
-    background_img = pygame.image.load(r'C:\Users\sandl\PycharmProjects\PokemonGame\data\pok.png')
+    background_img = pygame.image.load(r'..\data\pok.png')
     background = pygame.transform.scale(background_img, (screen.get_width(), screen.get_height()))
     screen.blit(background, (0, 0))
 
