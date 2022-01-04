@@ -41,11 +41,10 @@ def main():
     starTime = cnf.timeToEnd
     flag = 1
     while flag:
-        cnf.timeToEnd=float(client.time_to_end())
+        cnf.timeToEnd = float(client.time_to_end())
 
         if len(cnf.agentsPath[0]) == 0:
             print("")
-
 
         # assigning an agent for new pokemon's from the server
         # check if any of the agents need to 'Move'
@@ -53,7 +52,7 @@ def main():
         set_next_node()
 
         if len(cnf.moveTimes) == 0:
-            print(client.time_to_end())
+            print(cnf.timeToEnd)
             print("")
 
         cnf.pokemonTimes.sort(reverse=True)
@@ -64,8 +63,8 @@ def main():
             print(client.time_to_end())
             print(cnf.agentsPath[0])
             print(cnf.pokemons)
-            print("pop pokemon time: " + str(cnf.pokemonTimes.pop(0)))
-        print("move time: "+str(cnf.moveTimes))
+            print("pop pokemon time: " + str(cnf.pokemonTimes.pop(0)) + "," + str(cnf.timeToEnd))
+        print("move time: " + str(cnf.moveTimes))
         timePassed = starTime - cnf.timeToEnd
         if catchPokemon or (False in cnf.isMoved and moveCounter <= timePassed / 100):
             cnf.moveTimes.sort(reverse=True)
@@ -75,10 +74,11 @@ def main():
                 moveCounter += 1
                 cnf.isMoved = [True for _ in range(cnf.agentsNum)]
             while len(cnf.moveTimes) > 0 and cnf.moveTimes[0] > cnf.timeToEnd:
-                print("pop move time: "+str(cnf.moveTimes.pop(0)))
+                print("pop move time: " + str(cnf.moveTimes.pop(0)) + "," + str(cnf.timeToEnd))
 
             catchPokemon = False
 
+        updateServer()
         draw()
         assignNewPok()
         # client.move()
@@ -123,13 +123,7 @@ def isHandled(pok) -> bool:
 
 
 def assignNewPok():
-    cnf.pokemons = json.loads(client.get_pokemons(),
-                              object_hook=lambda d: SimpleNamespace(**d)).Pokemons
-    cnf.pokemons = [p.Pokemon for p in cnf.pokemons]
-
-    cnf.agents = json.loads(client.get_agents(),
-                            object_hook=lambda d: SimpleNamespace(**d)).Agents
-    cnf.agents = [agent.Agent for agent in cnf.agents]
+    updateServer()
 
     for p in cnf.handledPokemons:
         exist = False
@@ -177,12 +171,23 @@ def set_next_node():
                     distance = mt.sqrt(mt.pow(float(Sx) - float(Px), 2) + mt.pow(float(Sy) - float(Py), 2))
                     pokWeight = (distance / edgeDistance) * weight
                     cnf.pokemonTimes.append(cnf.timeToEnd - ((pokWeight / cnf.agents[i].speed) * 1000))
-                    print("add pokemon time: "+str(cnf.timeToEnd - ((pokWeight / cnf.agents[i].speed) * 1000)))
+                    print("add pokemon time: " + str(cnf.timeToEnd - ((pokWeight / cnf.agents[i].speed) * 1000)))
 
             client.choose_next_edge('{"agent_id":' + str(i) + ', "next_node_id":' + str(Next) + '}')
             weight = cnf.gameMap.all_out_edges_of_node(src)[Next]
-            cnf.moveTimes.append(cnf.timeToEnd - ((weight / cnf.agents[i].speed) * 1000))
-            print("add move time: "+str(cnf.timeToEnd - ((weight / cnf.agents[i].speed) * 1000)))
+            cnf.moveTimes.append(float(client.time_to_end()) - ((weight / cnf.agents[i].speed) * 1000))
+            print("add move time: " + str(
+                float(client.time_to_end()) - ((weight / cnf.agents[i].speed) * 1000)) + " ," + str(Next))
+
+
+def updateServer():
+    cnf.pokemons = json.loads(client.get_pokemons(),
+                              object_hook=lambda d: SimpleNamespace(**d)).Pokemons
+    cnf.pokemons = [p.Pokemon for p in cnf.pokemons]
+
+    cnf.agents = json.loads(client.get_agents(),
+                            object_hook=lambda d: SimpleNamespace(**d)).Agents
+    cnf.agents = [agent.Agent for agent in cnf.agents]
 
 
 if __name__ == "__main__":
