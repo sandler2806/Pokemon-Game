@@ -1,9 +1,5 @@
 import math
-
 from numpy.linalg import norm
-
-from graph.DiGraph import DiGraph
-from graph.GraphAlgo import GraphAlgo
 from client_python.client import *
 import json
 import client_python.config as cnf
@@ -19,7 +15,7 @@ def allocateEdge(bank: dict[(float, float), (float, float)], pos: list, type: in
     y = float(pos[1])
     pok = np.asarray([x, y])
     minDist = math.inf
-    minedge = []
+    minEdge = []
     for edge, mb in bank.items():
 
         ps = (cnf.gameMap.nodes[edge[0]].pos[0], cnf.gameMap.nodes[edge[0]].pos[1])
@@ -29,24 +25,13 @@ def allocateEdge(bank: dict[(float, float), (float, float)], pos: list, type: in
         d = norm(np.cross(pd - ps, ps - pok)) / norm(pd - ps)
         if d < minDist:
             minDist = d
-            minedge = edge
+            minEdge = edge
 
-        # m = mb[0]
-        # b = mb[1]
-        #
-        # booli = (abs(float(y) - (m * float(x) + b)) < 0.0001)
-        # # booli = float(y) == m * float(x) + b
-        # if booli:
-        #     if type > 0:
-        #         edge = (min(edge[0], edge[1]), max(edge[0], edge[1]))
-        #     else:
-        #         edge = (max(edge[0], edge[1]), min(edge[0], edge[1]))
-        #     return edge
     if type > 0:
-        minedge = (min(minedge[0], minedge[1]), max(minedge[0], minedge[1]))
+        minEdge = (min(minEdge[0], minEdge[1]), max(minEdge[0], minEdge[1]))
     else:
-        minedge = (max(minedge[0], minedge[1]), min(minedge[0], minedge[1]))
-    return minedge
+        minEdge = (max(minEdge[0], minEdge[1]), min(minEdge[0], minEdge[1]))
+    return minEdge
 
 
 def allocateAgent(pokemon: SimpleNamespace):
@@ -156,7 +141,6 @@ def dijkstra(src: int) -> (dict, dict):
     EdgesLst[src] = cnf.gameMap.adjList[src].outEdges.items()
     distances[src] = 0
     prev[src] = src
-    sdf = 4
     while len(que) > 0:
         # pop the smallest vertex
         dis, u = hp.heappop(que)
@@ -249,6 +233,5 @@ def centerPoint() -> int:
     Max = max(eccentricity.values())
     if Max == math.inf:  # one node is not reachable, there fore the graph is not connected
         ind = None
-        min_value = math.inf
     # return the min eccentricity and the node index
     return ind

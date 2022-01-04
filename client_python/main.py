@@ -1,5 +1,4 @@
 import json
-from types import SimpleNamespace
 from GUI import *
 import pygame
 from client_python.client import Client
@@ -20,7 +19,7 @@ def main():
 
     # load the map to graph
     cnf.gameMap = DiGraph(client.get_graph())
-    # dispach as much agents as possible
+    # dispatch as much agents as possible
     cnf.edgeBank = cnf.gameMap.edgeToLinear()
     cnf.pokemons = json.loads(client.get_pokemons(),
                               object_hook=lambda d: SimpleNamespace(**d)).Pokemons
@@ -98,15 +97,12 @@ def assignNewPok():
 
 
 def set_next_node():
-    EPS = 0.001
     for i in range(cnf.agentsNum):
         if cnf.agents[i].dest == -1 and len(cnf.agentsPath[i]) and cnf.isMoved[i]:
             cnf.isMoved[i] = False
             src = cnf.agents[i].src
             Next = cnf.agentsPath[i].pop(0)
-            # if Next % 1==0.75:
-            #     client.move()
-            #     Next = int(Next)
+
             if (src, Next) in cnf.criticalEdge[i]:
                 cnf.criticalEdge[i].remove((src, Next))
                 Next = int(Next)
@@ -128,13 +124,10 @@ def set_next_node():
                     distance = mt.sqrt(mt.pow(float(Sx) - float(Px), 2) + mt.pow(float(Sy) - float(Py), 2))
                     pokWeight = (distance / edgeDistance) * weight
                     cnf.pokemonTimes.append(cnf.timeToEnd - ((pokWeight / cnf.agents[i].speed) * 1000))
-                    print("add pokemon time: " + str(cnf.timeToEnd - ((pokWeight / cnf.agents[i].speed) * 1000)))
 
             client.choose_next_edge('{"agent_id":' + str(i) + ', "next_node_id":' + str(Next) + '}')
             weight = cnf.gameMap.all_out_edges_of_node(src)[Next]
             cnf.moveTimes.append((float(client.time_to_end()) - ((weight / cnf.agents[i].speed) * 1000), i))
-            print("add move time: " + str(
-                float(client.time_to_end()) - ((weight / cnf.agents[i].speed) * 1000)) + " ," + str(Next))
 
 
 def updateServer():
@@ -148,5 +141,4 @@ def updateServer():
 
 
 if __name__ == "__main__":
-    # init_game()
     main()
