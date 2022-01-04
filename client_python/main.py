@@ -4,7 +4,7 @@ from GUI import *
 import pygame
 from client_python.client import Client
 from graph.DiGraph import DiGraph
-from client_python.algo import allocateAgent, dispatchAgents, allocateEdge
+from client_python.algo import allocateAgent, dispatchAgents, allocateEdge, dijkstra
 import client_python.config as cnf
 import math as mt
 
@@ -26,7 +26,12 @@ def main():
     # dispach as much agents as possible
     dispatchAgents(client)
     cnf.edgeBank = cnf.gameMap.edgeToLinear()
+    cnf.agents = json.loads(client.get_agents(),
+                            object_hook=lambda d: SimpleNamespace(**d)).Agents
+    cnf.agents = [agent.Agent for agent in cnf.agents]
     # assigning the starting Pokemon's
+    for node in cnf.gameMap.nodes.values():
+        cnf.dijkstra[node.id] = dijkstra(node.id)[1]
     assignNewPok()
 
     init_GUI()
@@ -35,9 +40,9 @@ def main():
     starTime = float(client.time_to_end())
     flag = 1
     while flag:
-        print(client.get_agents())
-        print(client.get_info())
-        print(client.time_to_end())
+
+        if len(cnf.agentsPath[0])==0:
+            print("")
         # assigning an agent for new pokemon's from the server
         # check if any of the agents need to 'Move'
 
@@ -54,12 +59,14 @@ def main():
         cnf.pokemonTimes.sort(reverse=True)
         if len(cnf.pokemonTimes) > 0 and cnf.pokemonTimes[0] >= float(client.time_to_end()):
             client.move()
-            print("ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp")
+            print(client.get_agents())
+            print(client.get_info())
+            print(client.time_to_end())
+            print(cnf.agentsPath[0])
+            print(cnf.pokemons)
             cnf.pokemonTimes.pop(0)
-
+        print(cnf.moveTimes)
         timePassed = starTime - float(client.time_to_end())
-        print(catchPokemon)
-        print(False in cnf.isMoved)
         if catchPokemon or (False in cnf.isMoved and moveCounter <= timePassed / 100):
             cnf.moveTimes.sort(reverse=True)
             if len(cnf.moveTimes) > 0 and cnf.moveTimes[0] >= float(client.time_to_end()):

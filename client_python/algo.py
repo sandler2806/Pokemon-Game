@@ -33,12 +33,17 @@ def allocateAgent(pokemon: SimpleNamespace):
     minDelay = math.inf
     minAgent = None
     minPermute = []
+    if pokemon.pos=='35.20103595448387,32.10266757695841,0.0':
+        print("")
     x, y, _ = pokemon.pos.split(',')
     newEdge = allocateEdge(cnf.edgeBank, [x, y], pokemon.type)
+    # print("")'35.20103595448387,32.10266757695841,0.0'
+    # print("")'35.20641810155373,32.10582006082121,0.0'
+
     for agent in cnf.agents:
         src = agent.src if agent.dest == -1 else agent.dest
         if len(cnf.agentsPath[agent.id]) == 0:
-            dist = shortest_path(src, newEdge[0])[0]
+            dist = cnf.dijkstra[src][newEdge[0]]
             dist += cnf.gameMap.adjList[newEdge[0]].outEdges[newEdge[1]]
             if dist / agent.speed < minDelay:
                 minDelay = dist / agent.speed
@@ -50,7 +55,7 @@ def allocateAgent(pokemon: SimpleNamespace):
             permutes = list(itertools.permutations(list(range(0, len(pokemonEdges)))))
 
             for p in permutes:
-                dist = shortest_path(src, pokemonEdges[p[0]][0])[0]
+                dist = cnf.dijkstra[src][pokemonEdges[p[0]][0]]
                 dist += cnf.gameMap.adjList[pokemonEdges[p[0]][0]].outEdges[pokemonEdges[p[0]][1]]
 
                 for i in range(0, len(p) - 1):
@@ -60,11 +65,11 @@ def allocateAgent(pokemon: SimpleNamespace):
                     edge = pokemonEdges[p[i]]
                     nextEdge = pokemonEdges[p[i + 1]]
 
-                    dist += shortest_path(edge[1], nextEdge[0])[0]
+                    dist += cnf.dijkstra[edge[1]][nextEdge[0]]
                     dist += cnf.gameMap.adjList[nextEdge[0]].outEdges[nextEdge[1]]
 
                     if not arriveNewPokemon:
-                        dist += shortest_path(edge[1], nextEdge[0])[0]
+                        dist += cnf.dijkstra[edge[1]][nextEdge[0]]
                         dist += cnf.gameMap.adjList[nextEdge[0]].outEdges[nextEdge[1]]
 
                 if dist / agent.speed < minDelay:
