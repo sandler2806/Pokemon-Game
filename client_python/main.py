@@ -37,9 +37,11 @@ def main():
     init_GUI()
     # start the game
     client.start()
-    starTime = float(client.time_to_end())
+    cnf.timeToEnd = float(client.time_to_end())
+    starTime = cnf.timeToEnd
     flag = 1
     while flag:
+        cnf.timeToEnd=float(client.time_to_end())
 
         if len(cnf.agentsPath[0]) == 0:
             print("")
@@ -54,16 +56,8 @@ def main():
             print(client.time_to_end())
             print("")
 
-        # print(agentsStatus)
-        # for agent in cnf.agents:
-        #     if len(cnf.is_on_way_to_pok[agent.id]) != 0:
-        #         for pos in cnf.is_on_way_to_pok[agent.id]:
-        #             x, y, _ = agent.pos.split(',')
-        #             if abs(pos[0] - x) < EPS and abs(pos[1] - y) < EPS:
-        #                 catchPokemon = True
-        #                 cnf.is_on_way_to_pok[agent.id].remove(pos)
         cnf.pokemonTimes.sort(reverse=True)
-        if len(cnf.pokemonTimes) > 0 and cnf.pokemonTimes[0] >= float(client.time_to_end()):
+        if len(cnf.pokemonTimes) > 0 and cnf.pokemonTimes[0] >= cnf.timeToEnd:
             client.move()
             print(client.get_agents())
             print(client.get_info())
@@ -72,15 +66,15 @@ def main():
             print(cnf.pokemons)
             print("pop pokemon time: " + str(cnf.pokemonTimes.pop(0)))
         print("move time: "+str(cnf.moveTimes))
-        timePassed = starTime - float(client.time_to_end())
+        timePassed = starTime - cnf.timeToEnd
         if catchPokemon or (False in cnf.isMoved and moveCounter <= timePassed / 100):
             cnf.moveTimes.sort(reverse=True)
-            if len(cnf.moveTimes) > 0 and cnf.moveTimes[0] >= float(client.time_to_end()):
+            if len(cnf.moveTimes) > 0 and cnf.moveTimes[0] > cnf.timeToEnd:
                 client.move()
                 print("moved")
                 moveCounter += 1
                 cnf.isMoved = [True for _ in range(cnf.agentsNum)]
-            while len(cnf.moveTimes) > 0 and cnf.moveTimes[0] >= float(client.time_to_end()):
+            while len(cnf.moveTimes) > 0 and cnf.moveTimes[0] > cnf.timeToEnd:
                 print("pop move time: "+str(cnf.moveTimes.pop(0)))
 
             catchPokemon = False
@@ -182,13 +176,13 @@ def set_next_node():
                     Px, Py, _ = pokemon.pos.split(',')
                     distance = mt.sqrt(mt.pow(float(Sx) - float(Px), 2) + mt.pow(float(Sy) - float(Py), 2))
                     pokWeight = (distance / edgeDistance) * weight
-                    cnf.pokemonTimes.append(float(client.time_to_end()) - ((pokWeight / cnf.agents[i].speed) * 1000))
-                    print("add pokemon time: "+str(float(client.time_to_end()) - ((pokWeight / cnf.agents[i].speed) * 1000)))
+                    cnf.pokemonTimes.append(cnf.timeToEnd - ((pokWeight / cnf.agents[i].speed) * 1000))
+                    print("add pokemon time: "+str(cnf.timeToEnd - ((pokWeight / cnf.agents[i].speed) * 1000)))
 
             client.choose_next_edge('{"agent_id":' + str(i) + ', "next_node_id":' + str(Next) + '}')
             weight = cnf.gameMap.all_out_edges_of_node(src)[Next]
-            cnf.moveTimes.append(float(client.time_to_end()) - ((weight / cnf.agents[i].speed) * 1000))
-            print("add move time: "+str(float(client.time_to_end()) - ((weight / cnf.agents[i].speed) * 1000)))
+            cnf.moveTimes.append(cnf.timeToEnd - ((weight / cnf.agents[i].speed) * 1000))
+            print("add move time: "+str(cnf.timeToEnd - ((weight / cnf.agents[i].speed) * 1000)))
 
 
 if __name__ == "__main__":
