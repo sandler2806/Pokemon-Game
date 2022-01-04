@@ -40,9 +40,11 @@ def main():
     starTime = cnf.timeToEnd
     flag = 1
     while flag:
+        info = json.loads(client.get_info())
+        cnf.grade = info['GameServer']['grade']
+        cnf.movecounter = info['GameServer']['moves']
         move = False
         cnf.timeToEnd = float(client.time_to_end())
-
         # assigning an agent for new pokemon's from the server
         # check if any of the agents need to 'Move'
 

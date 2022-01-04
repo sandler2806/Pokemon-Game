@@ -22,3 +22,5 @@ HOST = '127.0.0.1'
 is_on_way_to_pok: list = []  # initiated in "dispatchAgents" (in algo.c)
 dijkstra: dict[int,dict]={}
 timeToEnd:float
+grade:float
+movecounter:int

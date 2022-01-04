@@ -41,14 +41,38 @@ def init_GUI():
 
 def draw():
     global radius, FONT, screen
+    buttonW = 50
+    buttonH = 30
+    buttonX = screen.get_width() / 10
+    buttonY = screen.get_height() / 15
+
+    counterX = screen.get_width() / 1.3
+    gradeX = screen.get_width() / 1.3
+    gradeY = buttonY + buttonH
+
+    mouse = pygame.mouse.get_pos()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             exit(0)
+        if event.type == pygame.MOUSEBUTTONDOWN:
 
+            # if the mouse is clicked on the
+            # button the game is terminated
+            if buttonX <= mouse[0] <= buttonX + buttonW and buttonY <= mouse[1] <= screen.get_height() + buttonH:
+                pygame.quit()
     # refresh surface
     screen.fill(Color(0, 0, 0))
 
+    smallfont = pygame.font.SysFont('Corbel', 17)
+    pygame.draw.rect(screen, (255, 255, 255), [buttonX, buttonY, buttonW, buttonH])
+    screen.blit(smallfont.render('stop', True, (255, 0, 0)), (buttonX + buttonW / 4, buttonY))
+    screen.blit(smallfont.render('move counter:', True, (255, 0, 0)), (counterX + buttonW / 4, buttonY))
+    screen.blit(smallfont.render('grade:', True, (255, 0, 0)), (gradeX + buttonW / 4, gradeY))
+    screen.blit(smallfont.render(str(cnf.grade), True, (255, 0, 0)), (gradeX + 5*buttonW / 4, gradeY))
+    screen.blit(smallfont.render(str(cnf.movecounter), True, (255, 0, 0)), (counterX +10*buttonW / 4, buttonY))
+
+    # (width / 2 + 50, height / 2)
     # draw nodes
     for n in cnf.gameMap.nodes.values():
         x = my_scale(n.pos[0], x=True)
