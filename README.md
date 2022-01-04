@@ -46,6 +46,17 @@ Beyond the obvious need to write a good and efficient algorithm, we cant access 
  After the server is running, open the main.py module in your favorite IDE and execute the main function, the game should start running and the GUI will start showing it
  </p>
  
+ <h2>The algorithm </h2>
+<p>
+ In the begining of the game, we transform the game map to a DiGraph object (our implementation of Directed graph), with this we are able to run various graph operations and algorithms to help us make decisions. <br>
+ When a new pokemon appear, we will try to pick the best agent to handle it in order to maximise our results. <br>
+ The choosing process is based on several parameters.
+ first, we calculate the time it takes for each agent to complete its current missions, then again for each agent we calculate how much time will it take for it to catch all its assigned pokemon's plus the new one, while taking into account all the possible catching orders.<br>
+ To detrmine the travling time, we use <strong>Dijkstra's algorithm </strong> and a modified version of TSP algorithm. <br>
+ After we did this calculation for every agent, we choose the agent with the least overhead generated from haveng to catch the new pokimone
+ 
+ </p>
+ 
  
  
 <h3>UML diagram </h3>
