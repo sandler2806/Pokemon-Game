@@ -17,9 +17,9 @@ import numpy as np
 def allocateEdge(bank: dict[(float, float), (float, float)], pos: list, type: int) -> (float, float):
     x = float(pos[0])
     y = float(pos[1])
-    pok = np.asarray([x,y])
+    pok = np.asarray([x, y])
     minDist = math.inf
-    minedge=[]
+    minedge = []
     for edge, mb in bank.items():
 
         ps = (cnf.gameMap.nodes[edge[0]].pos[0], cnf.gameMap.nodes[edge[0]].pos[1])
@@ -53,25 +53,26 @@ def allocateAgent(pokemon: SimpleNamespace):
     minDelay = math.inf
     minAgent = None
     minPermute = []
-    if pokemon.pos == '35.20103595448387,32.10266757695841,0.0':
-        print("")
+
     x, y, _ = pokemon.pos.split(',')
     newEdge = allocateEdge(cnf.edgeBank, [x, y], pokemon.type)
-    # print("")'35.20103595448387,32.10266757695841,0.0'
-    # print("")'35.20641810155373,32.10582006082121,0.0'
 
     for agent in cnf.agents:
         src = agent.src if agent.dest == -1 else agent.dest
         if len(cnf.agentsPath[agent.id]) == 0:
             dist = cnf.dijkstra[src][newEdge[0]]
             dist += cnf.gameMap.adjList[newEdge[0]].outEdges[newEdge[1]]
-            if dist / agent.speed < minDelay:
-                minDelay = dist / agent.speed
+            if (dist / agent.speed) < minDelay:
+                minDelay = (dist / agent.speed)
                 minAgent = agent
         else:
             arriveNewPokemon = False
             pokemonEdges = list(copy.deepcopy(cnf.criticalEdge[agent.id]))
-            pokemonEdges.insert(0, newEdge)
+            if newEdge not in pokemonEdges:
+                pokemonEdges.insert(0, newEdge)
+            else:
+                pokemonEdges.remove(newEdge)
+                pokemonEdges.insert(0, newEdge)
             permutes = list(itertools.permutations(list(range(0, len(pokemonEdges)))))
 
             for p in permutes:
@@ -98,7 +99,7 @@ def allocateAgent(pokemon: SimpleNamespace):
                     minPermute = p
 
     src = minAgent.src if minAgent.dest == -1 else minAgent.dest
-    if len(minPermute) == 0:
+    if len(cnf.criticalEdge[minAgent.id]) == 0:
         cnf.agentsPath[minAgent.id] = shortest_path(src, newEdge[0])[1]
         cnf.agentsPath[minAgent.id].append(newEdge[1])
         cnf.agentsPath[minAgent.id].pop(0)
@@ -106,7 +107,12 @@ def allocateAgent(pokemon: SimpleNamespace):
         cnf.agentsPath[minAgent.id].insert(0, start)
     else:
         pokemonEdges = copy.deepcopy(cnf.criticalEdge[minAgent.id])
-        pokemonEdges.insert(0, newEdge)
+        if newEdge not in pokemonEdges:
+            pokemonEdges.insert(0, newEdge)
+        else:
+            pokemonEdges.remove(newEdge)
+            pokemonEdges.insert(0, newEdge)
+
         ans = []
         ans.extend(shortest_path(src, pokemonEdges[minPermute[0]][0])[1])
         ans.append(pokemonEdges[minPermute[0]][1])
@@ -118,13 +124,13 @@ def allocateAgent(pokemon: SimpleNamespace):
             temp = shortest_path(edge[1], nextEdge[0])[1]
             temp.pop(0)
             ans.extend(temp)
-            # ans.append(cnf.gameMap.adjList[nextEdge[0]].outEdges[nextEdge[1]])
             ans.append(nextEdge[1])
         cnf.agentsPath[minAgent.id] = ans
     if len(cnf.criticalEdge[minAgent.id]) == 0:
         cnf.criticalEdge[minAgent.id] = [newEdge]
     else:
-        cnf.criticalEdge[minAgent.id].append(newEdge)
+        if newEdge not in cnf.criticalEdge[minAgent.id]:
+            cnf.criticalEdge[minAgent.id].append(newEdge)
 
 
 def dijkstra(src: int) -> (dict, dict):
@@ -214,7 +220,7 @@ def dispatchAgents(c: Client):
         cnf.is_on_way_to_pok.append([])
         cnf.isMoved.append(True)
         cnf.agentsPath[i] = []
-        cnf.criticalEdge[i] = []
+        cnf.criticalEdge[i] = {}
 
 
 def centerPoint() -> int:

@@ -19,8 +19,6 @@ def main():
     client = Client()
     client.start_connection(cnf.HOST, cnf.PORT)
 
-    print(client.get_agents())
-
     # load the map to graph
     cnf.gameMap = DiGraph(client.get_graph())
     # dispach as much agents as possible
@@ -41,78 +39,36 @@ def main():
     starTime = cnf.timeToEnd
     flag = 1
     while flag:
+        move = False
         cnf.timeToEnd = float(client.time_to_end())
-
-        if len(cnf.agentsPath[0]) == 0:
-            print("")
 
         # assigning an agent for new pokemon's from the server
         # check if any of the agents need to 'Move'
 
         set_next_node()
 
-        if len(cnf.moveTimes) == 0:
-            print(cnf.timeToEnd)
-            print("")
-
         cnf.pokemonTimes.sort(reverse=True)
         if len(cnf.pokemonTimes) > 0 and cnf.pokemonTimes[0] >= cnf.timeToEnd:
-            client.move()
-            print(client.get_agents())
-            print(client.get_info())
-            print(client.time_to_end())
-            print(cnf.agentsPath[0])
-            print(cnf.pokemons)
-            print("pop pokemon time: " + str(cnf.pokemonTimes.pop(0)) + "," + str(cnf.timeToEnd))
-        print("move time: " + str(cnf.moveTimes))
+            move = True
+            cnf.pokemonTimes.pop(0)
         timePassed = starTime - cnf.timeToEnd
         if catchPokemon or (False in cnf.isMoved and moveCounter <= timePassed / 100):
-            cnf.moveTimes.sort(reverse=True)
-            if len(cnf.moveTimes) > 0 and cnf.moveTimes[0] > cnf.timeToEnd:
-                client.move()
-                print("moved")
-                moveCounter += 1
-                cnf.isMoved = [True for _ in range(cnf.agentsNum)]
-            while len(cnf.moveTimes) > 0 and cnf.moveTimes[0] > cnf.timeToEnd:
-                print("pop move time: " + str(cnf.moveTimes.pop(0)) + "," + str(cnf.timeToEnd))
+            cnf.moveTimes.sort(reverse=True, key=lambda y: y[0])
+
+            if len(cnf.moveTimes) > 0 and cnf.moveTimes[0][0] > cnf.timeToEnd:
+                move = True
+            while len(cnf.moveTimes) > 0 and cnf.moveTimes[0][0] > cnf.timeToEnd:
+                cnf.isMoved[cnf.moveTimes.pop(0)[1]] = True
 
             catchPokemon = False
+
+        if move:
+            client.move()
 
         updateServer()
         draw()
         assignNewPok()
-        # client.move()
         clock.tick(60)
-
-    # while True:
-    #     print(client.get_agents())
-    #     client.choose_next_edge('{"agent_id":' + str(0) + ', "next_node_id":' + str(8) + '}')
-    #     client.move()
-    #     print(client.get_agents())
-    #     # print(client.get_agents())
-    #     # print(client.get_agents())
-    #
-    #     client.move()
-    #     print(client.get_agents())
-    #     print(client.get_agents())
-    #
-    #     print(client.get_agents())
-    #     print(client.get_agents())
-    #     print(client.get_agents())
-    #     print(client.get_agents())
-    #
-    #     # print(client.get_info())
-    #     client.choose_next_edge('{"agent_id":' + str(0) + ', "next_node_id":' + str(9) + '}')
-    #     print(client.get_agents())
-    #     print(client.get_info())
-    #     client.move()
-
-
-# def init_game():
-#     global client
-#     client = Client()
-#     client = Client()
-#     client.start_connection(cnf.HOST, cnf.PORT)
 
 
 def isHandled(pok) -> bool:
@@ -175,7 +131,7 @@ def set_next_node():
 
             client.choose_next_edge('{"agent_id":' + str(i) + ', "next_node_id":' + str(Next) + '}')
             weight = cnf.gameMap.all_out_edges_of_node(src)[Next]
-            cnf.moveTimes.append(float(client.time_to_end()) - ((weight / cnf.agents[i].speed) * 1000))
+            cnf.moveTimes.append((float(client.time_to_end()) - ((weight / cnf.agents[i].speed) * 1000), i))
             print("add move time: " + str(
                 float(client.time_to_end()) - ((weight / cnf.agents[i].speed) * 1000)) + " ," + str(Next))
 
