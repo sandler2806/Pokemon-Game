@@ -21,8 +21,14 @@ Beyond the obvious need to write a good and efficient algorithm, we cant access 
  
  <h2>Design </h2>
  Our design conform to the staple OOP principles and to the MVC design pattern. <br>
- df
  
+ To match the MVP design pattern we divided our code the 3 main parts: </br>
+ 
+ <strong>main: </strong> provide the infrastructure to communicate with the server and use it's data to issue commands for the app.
+ 
+ <strong>GUI: </strong> serve as the "veiw" part, helps to user to follow the progress of the game, rely on main for communication with server and dosent perform any logical or algorithmic operations.
+ 
+ <strong> Config: </strong> Contain and update the data we get from the server, agents locations, pokemon locations etc...
 <p>
   
  </p>
@@ -36,7 +42,8 @@ Beyond the obvious need to write a good and efficient algorithm, we cant access 
  
 <h2>How to run the project</h2>
 <p>
-  
+  To run the project you have first to download or clone the code. Then you should run the server with the following command: <strong> java -jar Ex4_Server_v0.0.jar 1 </strong>  (1 is the number of the level, choose one between 0 to 15) <br>
+ After the server is running, open the main.py module in your favorite IDE and execute the main function, the game should start running and the GUI will start showing it
  </p>
  
  
