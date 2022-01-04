@@ -41,12 +41,18 @@ def main():
     flag = 1
     while flag:
 
-        if len(cnf.agentsPath[0])==0:
+        if len(cnf.agentsPath[0]) == 0:
             print("")
+
+
         # assigning an agent for new pokemon's from the server
         # check if any of the agents need to 'Move'
 
         set_next_node()
+
+        if len(cnf.moveTimes) == 0:
+            print(client.time_to_end())
+            print("")
 
         # print(agentsStatus)
         # for agent in cnf.agents:
@@ -64,8 +70,8 @@ def main():
             print(client.time_to_end())
             print(cnf.agentsPath[0])
             print(cnf.pokemons)
-            cnf.pokemonTimes.pop(0)
-        print(cnf.moveTimes)
+            print("pop pokemon time: " + str(cnf.pokemonTimes.pop(0)))
+        print("move time: "+str(cnf.moveTimes))
         timePassed = starTime - float(client.time_to_end())
         if catchPokemon or (False in cnf.isMoved and moveCounter <= timePassed / 100):
             cnf.moveTimes.sort(reverse=True)
@@ -75,7 +81,7 @@ def main():
                 moveCounter += 1
                 cnf.isMoved = [True for _ in range(cnf.agentsNum)]
             while len(cnf.moveTimes) > 0 and cnf.moveTimes[0] >= float(client.time_to_end()):
-                cnf.moveTimes.pop(0)
+                print("pop move time: "+str(cnf.moveTimes.pop(0)))
 
             catchPokemon = False
 
@@ -177,10 +183,12 @@ def set_next_node():
                     distance = mt.sqrt(mt.pow(float(Sx) - float(Px), 2) + mt.pow(float(Sy) - float(Py), 2))
                     pokWeight = (distance / edgeDistance) * weight
                     cnf.pokemonTimes.append(float(client.time_to_end()) - ((pokWeight / cnf.agents[i].speed) * 1000))
+                    print("add pokemon time: "+str(float(client.time_to_end()) - ((pokWeight / cnf.agents[i].speed) * 1000)))
 
             client.choose_next_edge('{"agent_id":' + str(i) + ', "next_node_id":' + str(Next) + '}')
             weight = cnf.gameMap.all_out_edges_of_node(src)[Next]
             cnf.moveTimes.append(float(client.time_to_end()) - ((weight / cnf.agents[i].speed) * 1000))
+            print("add move time: "+str(float(client.time_to_end()) - ((weight / cnf.agents[i].speed) * 1000)))
 
 
 if __name__ == "__main__":

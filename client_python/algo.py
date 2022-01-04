@@ -1,5 +1,7 @@
 import math
 
+from numpy.linalg import norm
+
 from graph.DiGraph import DiGraph
 from graph.GraphAlgo import GraphAlgo
 from client_python.client import *
@@ -9,31 +11,49 @@ from types import SimpleNamespace
 import heapq as hp
 import itertools
 import copy
+import numpy as np
 
 
 def allocateEdge(bank: dict[(float, float), (float, float)], pos: list, type: int) -> (float, float):
-    x = pos[0]
-    y = pos[1]
-
+    x = float(pos[0])
+    y = float(pos[1])
+    pok = np.asarray([x,y])
+    minDist = math.inf
+    minedge=[]
     for edge, mb in bank.items():
-        m = mb[0]
-        b = mb[1]
-        booli = (abs(float(y) - (m * float(x) + b)) < 0.0001)
-        # booli = float(y) == m * float(x) + b
-        if booli:
-            if type > 0:
-                edge = (min(edge[0], edge[1]), max(edge[0], edge[1]))
-            else:
-                edge = (max(edge[0], edge[1]), min(edge[0], edge[1]))
-            return edge
-    return None
+
+        ps = (cnf.gameMap.nodes[edge[0]].pos[0], cnf.gameMap.nodes[edge[0]].pos[1])
+        pd = (cnf.gameMap.nodes[edge[1]].pos[0], cnf.gameMap.nodes[edge[1]].pos[1])
+        ps = np.asarray(ps)
+        pd = np.asarray(pd)
+        d = norm(np.cross(pd - ps, ps - pok)) / norm(pd - ps)
+        if d < minDist:
+            minDist = d
+            minedge = edge
+
+        # m = mb[0]
+        # b = mb[1]
+        #
+        # booli = (abs(float(y) - (m * float(x) + b)) < 0.0001)
+        # # booli = float(y) == m * float(x) + b
+        # if booli:
+        #     if type > 0:
+        #         edge = (min(edge[0], edge[1]), max(edge[0], edge[1]))
+        #     else:
+        #         edge = (max(edge[0], edge[1]), min(edge[0], edge[1]))
+        #     return edge
+    if type > 0:
+        minedge = (min(minedge[0], minedge[1]), max(minedge[0], minedge[1]))
+    else:
+        minedge = (max(minedge[0], minedge[1]), min(minedge[0], minedge[1]))
+    return minedge
 
 
 def allocateAgent(pokemon: SimpleNamespace):
     minDelay = math.inf
     minAgent = None
     minPermute = []
-    if pokemon.pos=='35.20103595448387,32.10266757695841,0.0':
+    if pokemon.pos == '35.20103595448387,32.10266757695841,0.0':
         print("")
     x, y, _ = pokemon.pos.split(',')
     newEdge = allocateEdge(cnf.edgeBank, [x, y], pokemon.type)
@@ -100,7 +120,7 @@ def allocateAgent(pokemon: SimpleNamespace):
             ans.extend(temp)
             # ans.append(cnf.gameMap.adjList[nextEdge[0]].outEdges[nextEdge[1]])
             ans.append(nextEdge[1])
-        cnf.agentsPath[minAgent.id]=ans
+        cnf.agentsPath[minAgent.id] = ans
     if len(cnf.criticalEdge[minAgent.id]) == 0:
         cnf.criticalEdge[minAgent.id] = [newEdge]
     else:
