@@ -15,15 +15,17 @@ def main():
     global client
     moveCounter = 0
     clock = pygame.time.Clock()
-    catchPokemon = False
     client = Client()
     client.start_connection(cnf.HOST, cnf.PORT)
 
     # load the map to graph
     cnf.gameMap = DiGraph(client.get_graph())
     # dispach as much agents as possible
-    dispatchAgents(client)
     cnf.edgeBank = cnf.gameMap.edgeToLinear()
+    cnf.pokemons = json.loads(client.get_pokemons(),
+                              object_hook=lambda d: SimpleNamespace(**d)).Pokemons
+    cnf.pokemons = [p.Pokemon for p in cnf.pokemons]
+    dispatchAgents(client)
     cnf.agents = json.loads(client.get_agents(),
                             object_hook=lambda d: SimpleNamespace(**d)).Agents
     cnf.agents = [agent.Agent for agent in cnf.agents]
@@ -51,16 +53,15 @@ def main():
         if len(cnf.pokemonTimes) > 0 and cnf.pokemonTimes[0] >= cnf.timeToEnd:
             move = True
             cnf.pokemonTimes.pop(0)
+
         timePassed = starTime - cnf.timeToEnd
-        if catchPokemon or (False in cnf.isMoved and moveCounter <= timePassed / 100):
+        if False in cnf.isMoved and moveCounter <= timePassed / 100:
             cnf.moveTimes.sort(reverse=True, key=lambda y: y[0])
 
             if len(cnf.moveTimes) > 0 and cnf.moveTimes[0][0] > cnf.timeToEnd:
                 move = True
             while len(cnf.moveTimes) > 0 and cnf.moveTimes[0][0] > cnf.timeToEnd:
                 cnf.isMoved[cnf.moveTimes.pop(0)[1]] = True
-
-            catchPokemon = False
 
         if move:
             client.move()

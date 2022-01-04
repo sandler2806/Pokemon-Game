@@ -205,22 +205,30 @@ def dispatchAgents(c: Client):
     j = json.loads(c.get_info())
     cnf.agentsNum = j['GameServer']['agents']
     centerId = centerPoint()
-    str = "\"id\":{}".format(centerId)
-    c.add_agent("{" + str + "}")
-    cnf.is_on_way_to_pok.append([])
-    cnf.isMoved.append(True)
-    cnf.agentsPath[0] = []
-    cnf.criticalEdge[0] = []
-    for i in range(1, cnf.agentsNum):
-        if ((centerId + i * (cnf.gameMap.v_size() / cnf.agentsNum)) % cnf.gameMap.v_size()) in cnf.gameMap.nodes.keys():
-            str = "\"id\":{}".format((centerId + i * cnf.gameMap.v_size() / cnf.agentsNum) % cnf.gameMap.v_size())
-        else:
-            str = "\"id\":{}".format(centerId)
+
+    poks = copy.deepcopy(cnf.pokemons)
+    agCounter = 0
+
+    for i in range(0, len(poks)):
+        if agCounter < cnf.agentsNum:
+            edge = allocateEdge(cnf.edgeBank, poks[i].pos.split(','), poks[i].type)
+            src = edge[0]
+            str = "\"id\":{}".format(src)
+            c.add_agent("{" + str + "}")
+            cnf.is_on_way_to_pok.append([])
+            cnf.isMoved.append(True)
+            cnf.agentsPath[agCounter] = []
+            cnf.criticalEdge[agCounter] = []
+            agCounter += 1
+
+    while agCounter < cnf.agentsNum:
+        str = "\"id\":{}".format(centerId)
         c.add_agent("{" + str + "}")
         cnf.is_on_way_to_pok.append([])
         cnf.isMoved.append(True)
-        cnf.agentsPath[i] = []
-        cnf.criticalEdge[i] = {}
+        cnf.agentsPath[agCounter] = []
+        cnf.criticalEdge[agCounter] = []
+        agCounter += 1
 
 
 def centerPoint() -> int:
