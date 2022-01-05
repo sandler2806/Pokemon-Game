@@ -35,7 +35,7 @@ Beyond the obvious need to write a good and efficient algorithm, we cant access 
  
 <h2>Graphical interface </h2>
 <p>
-  
+  See our Wiki page for a complete explantion of the GUI
  </p>
  
  
@@ -69,8 +69,7 @@ Beyond the obvious need to write a good and efficient algorithm, we cant access 
 <p>
   We "played" every level of the game and wrote down the results in a single table. <br>
  notice that we never crossed the premmited number of moves per second (game 0 is 30 seconds long and all the rest are 60 seconds)
-
  
- <p align = "center"> <img src = "https://user-images.githubusercontent.com/74304423/148115250-d6220bbd-63a7-416d-aae1-2b770b76f177.jpeg"> </p>
+ <p align = "center"> <img src = "https://user-images.githubusercontent.com/74304423/148203066-c8ffb683-bc83-4fd6-b697-1ee58eb7e5f5.jpeg"> </p>
 
  </p>
