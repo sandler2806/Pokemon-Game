@@ -22,11 +22,11 @@ Beyond the obvious need to write a good and efficient algorithm, we cant access 
  <h2>Design </h2>
  Our design conform to the staple OOP principles and to the MVC design pattern. <br>
  
- To match the MVP design pattern we divided our code the 3 main parts: </br>
+ To match the <strong>MVC</strong> design pattern we divided our code the 3 main parts: </br>
  
  <strong>main: </strong> provide the infrastructure to communicate with the server and use it's data to issue commands for the app.
  
- <strong>GUI: </strong> serve as the "veiw" part, helps to user to follow the progress of the game, rely on main for communication with server and dosent perform any logical or algorithmic operations.
+ <strong>GUI: </strong> serve as the "view" part, helps to user to follow the progress of the game, rely on main for communication with server and dosent perform any logical or algorithmic operations.
  
  <strong> Config: </strong> Contain and update the data we get from the server, agents locations, pokemon locations etc...
 <p>
