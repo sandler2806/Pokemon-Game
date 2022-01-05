@@ -12,8 +12,12 @@ import numpy as np
 
 class Algo:
 
+
     @staticmethod
     def allocateEdge(bank: dict[(float, float), (float, float)], pos: list, type: int) -> (float, float):
+        """
+        get a pokemon and return the edge in the graph he's sitting on
+        """
         x = float(pos[0])
         y = float(pos[1])
         pok = np.asarray([x, y])
@@ -38,22 +42,27 @@ class Algo:
 
     @staticmethod
     def allocateAgent(pokemon: SimpleNamespace):
+        """
+        gets a pokemon and assign an agent to catch it, using dijkstra's shortest path algorithm
+        """
         minDelay = math.inf
         minAgent = None
         minPermute = []
 
-        x, y, _ = pokemon.pos.split(',')
+        x, y, _ = pokemon.pos.split(',') # exctract the pokemon location
         newEdge = Algo.allocateEdge(cnf.edgeBank, [x, y], pokemon.type)
 
-        for agent in cnf.agents:
+        for agent in cnf.agents: # check all the agents
+
             src = agent.src if agent.dest == -1 else agent.dest
-            if len(cnf.agentsPath[agent.id]) == 0:
+            if len(cnf.agentsPath[agent.id]) == 0: # case where the agent is unemployed
                 dist = cnf.dijkstra[src][newEdge[0]]
                 dist += cnf.gameMap.adjList[newEdge[0]].outEdges[newEdge[1]]
                 if (dist / agent.speed) < minDelay:
                     minDelay = (dist / agent.speed)
                     minAgent = agent
-            else:
+
+            else: # agent is already busy with other pokemon's
                 arriveNewPokemon = False
                 pokemonEdges = list(copy.deepcopy(cnf.criticalEdge[agent.id]))
                 if newEdge not in pokemonEdges:
@@ -63,13 +72,14 @@ class Algo:
                     pokemonEdges.insert(0, newEdge)
                 permutes = list(itertools.permutations(list(range(0, len(pokemonEdges)))))
 
-                for p in permutes:
+                for p in permutes: # check all the permutations of handling order of the pokemon's
                     dist = cnf.dijkstra[src][pokemonEdges[p[0]][0]]
                     dist += cnf.gameMap.adjList[pokemonEdges[p[0]][0]].outEdges[pokemonEdges[p[0]][1]]
 
                     for i in range(0, len(p) - 1):
                         if p[i] == 0:
-                            arriveNewPokemon = True
+                            arriveNewPokemon = True # we count the weight till the new pokemon twice, so we use this var to
+
 
                         edge = pokemonEdges[p[i]]
                         nextEdge = pokemonEdges[p[i + 1]]
@@ -85,7 +95,8 @@ class Algo:
                         minDelay = dist / agent.speed
                         minAgent = agent
                         minPermute = p
-
+        # now we have all the agents minimal path time
+        # and we have to choose the best one
         src = minAgent.src if minAgent.dest == -1 else minAgent.dest
         if len(cnf.criticalEdge[minAgent.id]) == 0:
             cnf.agentsPath[minAgent.id] = Algo.shortest_path(src, newEdge[0])[1]
@@ -122,6 +133,10 @@ class Algo:
 
     @staticmethod
     def dijkstra(src: int) -> (dict, dict):
+        """
+        Dijkstra's shortest path algorithm
+        :return prev dictionary and distance dictionary
+        """
         # get the number of nodes from the graph
 
         nodes = cnf.gameMap.get_all_v()
@@ -161,6 +176,7 @@ class Algo:
                         hp.heappush(que, (altDis, ID))  # requeue v with the new priority
         return prev, distances
 
+
     @staticmethod
     def shortest_path(id1: int, id2: int) -> (float, list):
         """
@@ -189,6 +205,13 @@ class Algo:
 
     @staticmethod
     def dispatchAgents(c: Client):
+        """
+        dispatch the maximum amount of agents that the level support
+        :param c: a working client
+        :return: nothing
+        """
+
+        # get the number of agents from the server
         j = json.loads(c.get_info())
         cnf.agentsNum = j['GameServer']['agents']
         centerId = Algo.centerPoint()
@@ -196,21 +219,24 @@ class Algo:
         poks = copy.deepcopy(cnf.pokemons)
         agCounter = 0
 
+        # first, we dispatch agents near existing pokemon's
         for i in range(0, len(poks)):
             if agCounter < cnf.agentsNum:
                 edge = Algo.allocateEdge(cnf.edgeBank, poks[i].pos.split(','), poks[i].type)
                 src = edge[0]
                 str = "\"id\":{}".format(src)
                 c.add_agent("{" + str + "}")
+                # initialize agent parameters
                 cnf.is_on_way_to_pok.append([])
                 cnf.isMoved.append(True)
                 cnf.agentsPath[agCounter] = []
                 cnf.criticalEdge[agCounter] = []
                 agCounter += 1
-
+        # dispatch the rest of the agents (in case we have more agents then starting pokemon's)
         while agCounter < cnf.agentsNum:
             str = "\"id\":{}".format(centerId)
             c.add_agent("{" + str + "}")
+            # initialize agent parameters
             cnf.is_on_way_to_pok.append([])
             cnf.isMoved.append(True)
             cnf.agentsPath[agCounter] = []
