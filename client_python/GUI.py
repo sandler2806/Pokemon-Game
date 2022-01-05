@@ -70,7 +70,6 @@ class GUI:
                 if buttonX <= mouse[0] <= buttonX + buttonW and buttonY <= mouse[1] <= screen.get_height() + buttonH:
                     cnf.client.stop_connection()
                     sys.exit()
-        # refresh surface
         my_formatter = "{0:.1f}"
         timer = my_formatter.format(cnf.timeToEnd / 1000)
         smallfont = pygame.font.SysFont('Corbel', 17, bold=True)
@@ -88,7 +87,6 @@ class GUI:
             x = GUI.my_scale(n.pos[0], x=True)
             y = GUI.my_scale(n.pos[1], y=True)
 
-            # its just to get a nice antialiased circle
             gfxdraw.filled_circle(screen, int(x), int(y),
                                   GUI.radius, Color(64, 80, 174))
             gfxdraw.aacircle(screen, int(x), int(y),
@@ -103,8 +101,6 @@ class GUI:
         for src in cnf.gameMap.get_all_v().values():
             for dest in cnf.gameMap.all_out_edges_of_node(src.id).keys():
                 # find the edge nodes
-                # src = next(n for n in gameMap.nodes.values() if n.id == e.src)
-                # dest = next(n for n in graph.Nodes if n.id == e.dest)
                 dest = cnf.gameMap.get_node(dest)
 
                 # scaled positions

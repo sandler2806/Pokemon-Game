@@ -12,7 +12,6 @@ import numpy as np
 
 class Algo:
 
-
     @staticmethod
     def allocateEdge(bank: dict[(float, float), (float, float)], pos: list, type: int) -> (float, float):
         """
@@ -49,20 +48,20 @@ class Algo:
         minAgent = None
         minPermute = []
 
-        x, y, _ = pokemon.pos.split(',') # exctract the pokemon location
+        x, y, _ = pokemon.pos.split(',')  # extract the pokemon location
         newEdge = Algo.allocateEdge(cnf.edgeBank, [x, y], pokemon.type)
 
-        for agent in cnf.agents: # check all the agents
+        for agent in cnf.agents:  # check all the agents
 
             src = agent.src if agent.dest == -1 else agent.dest
-            if len(cnf.agentsPath[agent.id]) == 0: # case where the agent is unemployed
+            if len(cnf.agentsPath[agent.id]) == 0:  # case where the agent is unemployed
                 dist = cnf.dijkstra[src][newEdge[0]]
                 dist += cnf.gameMap.adjList[newEdge[0]].outEdges[newEdge[1]]
                 if (dist / agent.speed) < minDelay:
                     minDelay = (dist / agent.speed)
                     minAgent = agent
 
-            else: # agent is already busy with other pokemon's
+            else:  # agent is already busy with other pokemon's
                 arriveNewPokemon = False
                 pokemonEdges = list(copy.deepcopy(cnf.criticalEdge[agent.id]))
                 if newEdge not in pokemonEdges:
@@ -72,14 +71,13 @@ class Algo:
                     pokemonEdges.insert(0, newEdge)
                 permutes = list(itertools.permutations(list(range(0, len(pokemonEdges)))))
 
-                for p in permutes: # check all the permutations of handling order of the pokemon's
+                for p in permutes:  # check all the permutations of handling order of the pokemon's
                     dist = cnf.dijkstra[src][pokemonEdges[p[0]][0]]
                     dist += cnf.gameMap.adjList[pokemonEdges[p[0]][0]].outEdges[pokemonEdges[p[0]][1]]
 
                     for i in range(0, len(p) - 1):
                         if p[i] == 0:
-                            arriveNewPokemon = True # we count the weight till the new pokemon twice, so we use this var to
-
+                            arriveNewPokemon = True  # we count the weight till the new pokemon twice, so we use this var to
 
                         edge = pokemonEdges[p[i]]
                         nextEdge = pokemonEdges[p[i + 1]]
@@ -97,25 +95,33 @@ class Algo:
                         minPermute = p
         # now we have all the agents minimal path time
         # and we have to choose the best one
+
+        # we take the src of the chosen agent
         src = minAgent.src if minAgent.dest == -1 else minAgent.dest
+        # if the chosen agent doesnt have other pokemons to catch we set his path as the shortest path to the pokemon
         if len(cnf.criticalEdge[minAgent.id]) == 0:
             cnf.agentsPath[minAgent.id] = Algo.shortest_path(src, newEdge[0])[1]
             cnf.agentsPath[minAgent.id].append(newEdge[1])
             cnf.agentsPath[minAgent.id].pop(0)
             start = cnf.agentsPath[minAgent.id].pop(0)
             cnf.agentsPath[minAgent.id].insert(0, start)
+
+        # if the agent have more than one pokemon the take the best permutation and add all
+        # the paths one by one from the src to the last pokemon
         else:
+            # add the new pokemon to the pokemons list
             pokemonEdges = copy.deepcopy(cnf.criticalEdge[minAgent.id])
             if newEdge not in pokemonEdges:
                 pokemonEdges.insert(0, newEdge)
             else:
                 pokemonEdges.remove(newEdge)
                 pokemonEdges.insert(0, newEdge)
-
+            # add the first path from the src
             ans = []
             ans.extend(Algo.shortest_path(src, pokemonEdges[minPermute[0]][0])[1])
             ans.append(pokemonEdges[minPermute[0]][1])
             ans.pop(0)
+            # add all other paths between the pokemons
             for i in range(0, len(minPermute) - 1):
                 edge = pokemonEdges[minPermute[i]]
                 nextEdge = pokemonEdges[minPermute[i + 1]]
@@ -124,12 +130,12 @@ class Algo:
                 temp.pop(0)
                 ans.extend(temp)
                 ans.append(nextEdge[1])
+            # update the agent path to the new path(include the new pokemon)
             cnf.agentsPath[minAgent.id] = ans
-        if len(cnf.criticalEdge[minAgent.id]) == 0:
-            cnf.criticalEdge[minAgent.id] = [newEdge]
-        else:
-            if newEdge not in cnf.criticalEdge[minAgent.id]:
-                cnf.criticalEdge[minAgent.id].append(newEdge)
+
+        # add the new pokemon to the list of the pokemons agent
+        if newEdge not in cnf.criticalEdge[minAgent.id]:
+            cnf.criticalEdge[minAgent.id].append(newEdge)
 
     @staticmethod
     def dijkstra(src: int) -> (dict, dict):
@@ -175,7 +181,6 @@ class Algo:
                         prev[ID] = u
                         hp.heappush(que, (altDis, ID))  # requeue v with the new priority
         return prev, distances
-
 
     @staticmethod
     def shortest_path(id1: int, id2: int) -> (float, list):
