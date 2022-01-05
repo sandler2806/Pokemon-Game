@@ -1,0 +1,121 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+
+class client
+class GUI
+class Algo
+class config
+class DiGraph
+class main
+
+GUI--|>config
+GUI--|>main
+main--|>config
+main--|>Algo
+main--|>client
+main--|>GUI
+main--|>DiGraph
+Algo--|>config
+
+
+class main{
++main()
++isHandled()
++assignNewPok()
++set_next_node()
++updateServer()
+}
+
+
+class GUI{
++init_GUI()
++draw()
++scale()
++my_scale()
+}
+class DiGraph{
+-HashMap<Integer,container> adjacencyList
+-int mc
++getNode()
++getEdge()
++removeNode()
++removeEdge()
++addNode()
++addEdge()
++connect()
++iterNode()
++iterEdge()
+}
+class Algo{
++allocateEdge()
++allocateAgent()
++dijkstra()
++shortest_path()
++getPath()
++dispatchAgents()
++centerPoint()
+}
+
+class client{
++start_connection()
+-send_message()
++get_agents()
++add_agent()
++get_graph()
++get_info()
++get_pokemons()
++is_running()
++time_to_end()
++start()
++stop()
++move()
++choose_next_edge()
++log_in()
++stop_connection()
+
+}
+class config{
++gameMap: DiGraph
++handledPokemons: list
++edgeBank: dict
++agents: list
++pokemons: list
++agentsNum: int
++agentsPath: dict[int, [int]]
++criticalEdge: dict[int, {}]
++isMoved
++moveTimes
++pokemonTimes
++is_on_way_to_pok: list
++dijkstra: dict[int, dict]
++timeToEnd: float
++grade: float
++movecounter: int
++client: Client
+}
+
+'abstract class AbstractList
+'abstract AbstractCollection
+'interface List
+'interface Collection
+'
+'List <|-- AbstractList
+'Collection <|-- AbstractCollection
+'
+'Collection <|- List
+'AbstractCollection <|- AbstractList
+'AbstractList <|-- ArrayList
+'
+'class ArrayList {
+'Object[] elementData
+'size()
+'}
+'
+'enum TimeUnit {
+'DAYS
+'HOURS
+'MINUTES
+'}
+
+@enduml
