@@ -1,3 +1,5 @@
+import sys
+
 from pygame import gfxdraw
 import pygame
 from pygame import *
@@ -66,7 +68,8 @@ class GUI:
                 # if the mouse is clicked on the
                 # button the game is terminated
                 if buttonX <= mouse[0] <= buttonX + buttonW and buttonY <= mouse[1] <= screen.get_height() + buttonH:
-                    pygame.quit()
+                    cnf.client.stop_connection()
+                    sys.exit()
         # refresh surface
         my_formatter = "{0:.1f}"
         timer = my_formatter.format(cnf.timeToEnd / 1000)
