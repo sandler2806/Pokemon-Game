@@ -3,7 +3,7 @@ from GUI import *
 import pygame
 from client_python.client import Client
 from graph.DiGraph import DiGraph
-from client_python.algo import allocateAgent, dispatchAgents, allocateEdge, dijkstra
+from client_python.algo import Algo
 import client_python.config as cnf
 import math as mt
 
@@ -12,9 +12,8 @@ client: Client
 
 def main():
     global client
-    moveCounter = 0
     clock = pygame.time.Clock()
-    client = Client()
+    cnf.client = client = Client()
     client.start_connection(cnf.HOST, cnf.PORT)
 
     # load the map to graph
@@ -24,16 +23,16 @@ def main():
     cnf.pokemons = json.loads(client.get_pokemons(),
                               object_hook=lambda d: SimpleNamespace(**d)).Pokemons
     cnf.pokemons = [p.Pokemon for p in cnf.pokemons]
-    dispatchAgents(client)
+    Algo.dispatchAgents(client)
     cnf.agents = json.loads(client.get_agents(),
                             object_hook=lambda d: SimpleNamespace(**d)).Agents
     cnf.agents = [agent.Agent for agent in cnf.agents]
     # assigning the starting Pokemon's
     for node in cnf.gameMap.nodes.values():
-        cnf.dijkstra[node.id] = dijkstra(node.id)[1]
+        cnf.dijkstra[node.id] = Algo.dijkstra(node.id)[1]
     assignNewPok()
 
-    init_GUI()
+    GUI.init_GUI()
     # start the game
     client.start()
     cnf.timeToEnd = float(client.time_to_end())
@@ -56,7 +55,7 @@ def main():
             cnf.pokemonTimes.pop(0)
 
         timePassed = starTime - cnf.timeToEnd
-        if False in cnf.isMoved and moveCounter <= timePassed / 100:
+        if False in cnf.isMoved and cnf.movecounter <= timePassed / 100:
             cnf.moveTimes.sort(reverse=True, key=lambda y: y[0])
 
             if len(cnf.moveTimes) > 0 and cnf.moveTimes[0][0] > cnf.timeToEnd:
@@ -68,7 +67,7 @@ def main():
             client.move()
 
         updateServer()
-        draw()
+        GUI.draw()
         assignNewPok()
         clock.tick(60)
 
@@ -94,7 +93,7 @@ def assignNewPok():
     # look for new Pokemon's
     for pok in cnf.pokemons:
         if not isHandled(pok):
-            allocateAgent(pok)
+            Algo.allocateAgent(pok)
             cnf.handledPokemons.append(pok)
 
 
@@ -111,7 +110,7 @@ def set_next_node():
                 pokOnEdge = []
                 for pokemon in cnf.pokemons:
                     x, y, _ = pokemon.pos.split(',')
-                    edge = allocateEdge(cnf.edgeBank, [x, y], pokemon.type)
+                    edge = Algo.allocateEdge(cnf.edgeBank, [x, y], pokemon.type)
                     if edge == (src, Next):
                         pokOnEdge.append(pokemon)
 

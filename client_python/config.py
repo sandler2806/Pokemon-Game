@@ -1,4 +1,5 @@
 from graph.DiGraph import DiGraph
+from client_python.client import Client
 
 gameMap: DiGraph
 
@@ -14,13 +15,14 @@ agentsPath: dict[int, [int]] = {}
 # traversing it
 criticalEdge: dict[int, {}] = {}
 isMoved = []
-moveTimes=[]
-pokemonTimes=[]
+moveTimes = []
+pokemonTimes = []
 # final parameters
 PORT = 6666
 HOST = '127.0.0.1'
 is_on_way_to_pok: list = []  # initiated in "dispatchAgents" (in algo.c)
-dijkstra: dict[int,dict]={}
-timeToEnd:float
-grade:float
-movecounter:int
+dijkstra: dict[int, dict] = {}
+timeToEnd: float
+grade: float
+movecounter: int
+client: Client
