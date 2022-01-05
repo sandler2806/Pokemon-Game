@@ -36,15 +36,15 @@ class GUI:
         GUI.max_x = max(list(cnf.gameMap.nodes.values()), key=lambda n: n.pos[0]).pos[0]
         GUI.max_y = max(list(cnf.gameMap.nodes.values()), key=lambda n: n.pos[1]).pos[1]
 
-        """
-        The code below should be improved significantly:
-        The GUI and the "algo" are mixed - refactoring using MVC design pattern is required.
-        """
+
 
     @staticmethod
     def draw():
         screen = GUI.screen
         background_img = pygame.image.load(r'..\data\pok.png')
+        char = pygame.image.load(r'..\data\char.png')
+        bal = pygame.image.load(r'..\data\bal.png')
+        volt = pygame.image.load(r'..\data\voltrob.png')
         background = pygame.transform.scale(background_img, (screen.get_width(), screen.get_height()))
         screen.blit(background, (0, 0))
 
@@ -131,14 +131,16 @@ class GUI:
                 float(x), x=True), y=GUI.my_scale(float(y), y=True))
 
         for agent in scaledAgents:
-            pygame.draw.circle(screen, Color(122, 61, 23),
-                               (int(agent.pos.x), int(agent.pos.y)), 10)
+            volt = pygame.transform.scale(volt, (35, 35))
+            screen.blit(volt, (int(agent.pos.x) - 14, int(agent.pos.y) - 18))
 
         for p in scaledPok:
             if p.type > 0:
-                pygame.draw.circle(screen, Color(0, 255, 255), (int(p.pos.x), int(p.pos.y)), 10)
+                bal = pygame.transform.scale(bal, (35, 35))
+                screen.blit(bal, (int(p.pos.x) - 14, int(p.pos.y) - 18))
             else:
-                pygame.draw.circle(screen, Color(255, 0, 0), (int(p.pos.x), int(p.pos.y)), 10)
+                char = pygame.transform.scale(char, (35, 35))
+                screen.blit(char, (int(p.pos.x) - 14, int(p.pos.y) - 18))
 
         # update screen changes
         display.update()

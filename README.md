@@ -70,6 +70,6 @@ Beyond the obvious need to write a good and efficient algorithm, we cant access 
   We "played" every level of the game and wrote down the results in a single table. <br>
  notice that we never crossed the premmited number of moves per second (game 0 is 30 seconds long and all the rest are 60 seconds)
  
- <p align = "center"> <img src = "https://user-images.githubusercontent.com/74304423/148203066-c8ffb683-bc83-4fd6-b697-1ee58eb7e5f5.jpeg"> </p>
+ <p align = "center"> <img src = "https://github.com/noamv2/PokemonGame/blob/main/pics/ccb811ba-0742-4970-a3dd-6914dc8bb59c.jpg"> </p>
 
  </p>
