@@ -68,7 +68,7 @@ Beyond the obvious need to write a good and efficient algorithm, we cant access 
 <h3>Reuslts</h3>
 <p>
   We "played" every level of the game and wrote down the results in a single table. <br>
- notice that we never crossed the premmited number of moves per second (10 per second)
+ notice that we never crossed the premmited number of moves per second (game 0 is 30 seconds long and all the rest are 60 seconds)
 
  
  <p align = "center"> <img src = "https://user-images.githubusercontent.com/74304423/148115250-d6220bbd-63a7-416d-aae1-2b770b76f177.jpeg"> </p>
