@@ -68,23 +68,17 @@ class Test(TestCase):
     cnf.criticalEdge[0] = []
 
     def test_allocate_agent(self):
-
         Algo.allocateAgent(cnf.pokemons[1])
-        self.assertEqual(cnf.criticalEdge,{0: [(1, 0)]})
-        self.assertEqual((cnf.agentsPath,{0: [0]}))
-        print(cnf.criticalEdge)
-        print(cnf.agentsPath)
+        self.assertEqual(cnf.criticalEdge, {0: [(1, 0)]})
+        self.assertEqual(cnf.agentsPath, {0: [0]})
 
         Algo.allocateAgent(cnf.pokemons[2])
-        self.assertEqual(cnf.criticalEdge,{0: [(1, 0), (0, 10)]})
-        self.assertEqual((cnf.agentsPath,{0: [0, 10]}))
-        print(cnf.criticalEdge)
-        print(cnf.agentsPath)
+        self.assertEqual(cnf.criticalEdge, {0: [(1, 0), (0, 10)]})
+        self.assertEqual(cnf.agentsPath, {0: [0, 10]})
+
         Algo.allocateAgent(cnf.pokemons[0])
-        self.assertEqual(cnf.criticalEdge,{0: [(1, 0)]})
-        self.assertEqual((cnf.agentsPath,{0: [0]}))
-        print(cnf.criticalEdge)
-        print(cnf.agentsPath)
+        self.assertEqual(cnf.criticalEdge, {0: [(1, 0), (0, 10), (7, 6)]})
+        self.assertEqual(cnf.agentsPath, {0: [0, 10, 9, 8, 7, 6]})
 
     def test_allocateEdge(self):
         x, y, _ = cnf.pokemons[0].pos.split(',')
