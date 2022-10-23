@@ -53,7 +53,7 @@ Beyond the obvious need to write a good and efficient algorithm, we cant access 
  The choosing process is based on several parameters.
  first, we calculate the time it takes for each agent to complete its current missions, then again for each agent we calculate how much time will it take for it to catch all its assigned pokemon's plus the new one, while taking into account all the possible catching orders.<br>
  To detrmine the travling time, we use <strong>Dijkstra's algorithm </strong> and a modified version of TSP algorithm. <br>
- After we did this calculation for every agent, we choose the agent with the least overhead generated from haveng to catch the new pokimone
+ After we did this calculation for every agent, we choose the agent with the least overhead generated from having to catch the new pokemon
  
  </p>
  
